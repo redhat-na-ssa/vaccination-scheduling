@@ -69,7 +69,7 @@ $ ./target/*-runner
 
 Visit https://www.optaplanner.org/[www.optaplanner.org].
 
-== jbride
+== jbride notes
 
 . build image
 +
@@ -94,3 +94,4 @@ $ oc tag --source=docker \
          quay.io/jbride/optaplanner-quarkus-vaccination-scheduler-quickstart \
          p-vaccination:jbride-363f9f4
 -----
+
