@@ -7,7 +7,7 @@ public class Appointment {
     private VaccineType vType;
     private VaccinationCenter vCenter;
     private LocalDateTime timeslotDateTime;
-    private Person Person;
+    private Person person;
     private VaccinationStatus vStatus;
     private AppointmentStatus aStatus;
 
@@ -30,10 +30,10 @@ public class Appointment {
         this.timeslotDateTime = timeslotDateTime;
     }
     public Person getPerson() {
-        return Person;
+        return person;
     }
-    public void setPerson(Person Person) {
-        this.Person = Person;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 	public VaccinationStatus getvStatus() {
 		return vStatus;
