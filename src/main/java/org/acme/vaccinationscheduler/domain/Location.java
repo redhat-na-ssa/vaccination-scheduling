@@ -28,8 +28,7 @@ public class Location {
     // the following approximations are valid: 1° = 111 km (or 60 nautical miles) 0.1° = 11.1 km.
     public static final double METERS_PER_DEGREE = 111_000;
 
-    public final double latitude;
-    public final double longitude;
+    public final double latitude, longitude;
     
     public Location() {
     	this.latitude=0.0;
