@@ -21,6 +21,8 @@ public class VaccinationCenter {
     private String name;
     private Location location;
     private int lineCount;
+    
+    public VaccinationCenter() {}
 
     public VaccinationCenter(String name, Location location, int lineCount) {
         this.name = name;

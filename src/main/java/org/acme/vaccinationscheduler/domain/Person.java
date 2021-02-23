@@ -33,6 +33,8 @@ public class Person {
     private boolean firstShotInjected;
     private VaccineType firstShotVaccineType;
     private LocalDate secondShotIdealDate;
+    
+    public Person() {}
 
     public Person(long id, String name, Location homeLocation, LocalDate birthdate, int age) {
         this(id, name, homeLocation, birthdate, age, false, null, null);
