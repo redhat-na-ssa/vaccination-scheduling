@@ -51,13 +51,13 @@ public class AppointmentService {
 			throw new ServiceException(String.format("No appointment found for appointmentId[%s]", appointment.getAppointmentId()));
 		}
 		AppointmentEntity entity = optional.get();
-		entity.setAppointmentStatus(appointment.getAppointmentStatus());
+		entity.setAppointmentStatus(appointment.getAppointmentStatus()==null?null:appointment.getAppointmentStatus().toString());
 		entity.setIsFirstDoseAdministered(appointment.getIsFirstDoseAdministered());
 		entity.setPersonId(appointment.getPersonId());
 		entity.setPersonName(appointment.getPersonName());
 		entity.setTimeslotDateTime(appointment.getTimeslotDateTime());
 		entity.setVaccinationCenterName(appointment.getVaccinationCenterName());
-		entity.setVaccineType(appointment.getVaccineType());
+		entity.setVaccineType(appointment.getVaccineType()==null?null:appointment.getVaccineType().toString());
 		apptRepository.persist(entity);
 		return apptMapper.toDomain(entity);
 	}
@@ -73,7 +73,7 @@ public class AppointmentService {
 		}
 		AppointmentEntity entity = optional.get();
 		if(appointment.getAppointmentStatus()!=null)
-			entity.setAppointmentStatus(appointment.getAppointmentStatus());
+			entity.setAppointmentStatus(appointment.getAppointmentStatus().toString());
 		if(appointment.getIsFirstDoseAdministered()!=null)
 			entity.setIsFirstDoseAdministered(appointment.getIsFirstDoseAdministered());
 		if(appointment.getPersonId()!=null)
@@ -85,7 +85,7 @@ public class AppointmentService {
 		if(appointment.getVaccinationCenterName()!=null)
 			entity.setVaccinationCenterName(appointment.getVaccinationCenterName());
 		if(appointment.getVaccineType()!=null)
-			entity.setVaccineType(appointment.getVaccineType());
+			entity.setVaccineType(appointment.getVaccineType().toString());
 		apptRepository.persist(entity);
 		return apptMapper.toDomain(entity);
 	}
@@ -100,6 +100,19 @@ public class AppointmentService {
 			return save(appointment);
 		} else {
 			return update(appointment);
+		}
+	}
+
+	@Transactional
+	public Appointment saveOrUpdateNonNull(Appointment appointment) {
+		if (appointment.getAppointmentId() == null) {
+			throw new ServiceException("Appointment does not have an appointmentId");
+		}
+		Optional<AppointmentEntity> optional = apptRepository.findByIdOptional(appointment.getAppointmentId());
+		if (optional.isEmpty()) {
+			return save(appointment);
+		} else {
+			return updateNonNull(appointment);
 		}
 	}
 

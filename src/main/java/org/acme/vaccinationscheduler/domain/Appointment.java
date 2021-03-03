@@ -5,18 +5,18 @@ import java.time.LocalDateTime;
 public class Appointment {
 
 	private Long appointmentId;
-    private String vaccineType;
+    private VaccineType vaccineType;
     private String vaccinationCenterName;
     private LocalDateTime timeslotDateTime;
     private Long personId;
     private String personName;
     private Boolean isFirstDoseAdministered;
-    private String appointmentStatus;
+    private AppointmentStatus appointmentStatus;
     
-	public String getVaccineType() {
+	public VaccineType getVaccineType() {
 		return vaccineType;
 	}
-	public void setVaccineType(String vaccineType) {
+	public void setVaccineType(VaccineType vaccineType) {
 		this.vaccineType = vaccineType;
 	}
 	public Boolean getIsFirstDoseAdministered() {
@@ -55,10 +55,10 @@ public class Appointment {
 	public void setPersonName(String personName) {
 		this.personName = personName;
 	}
-	public String getAppointmentStatus() {
+	public AppointmentStatus getAppointmentStatus() {
 		return appointmentStatus;
 	}
-	public void setAppointmentStatus(String appointmentStatus) {
+	public void setAppointmentStatus(AppointmentStatus appointmentStatus) {
 		this.appointmentStatus = appointmentStatus;
 	}
 

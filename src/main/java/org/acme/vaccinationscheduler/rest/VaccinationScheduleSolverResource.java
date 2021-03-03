@@ -63,7 +63,9 @@ public class VaccinationScheduleSolverResource {
     public void solve() {
         solverManager.solveAndListen(1L,
                 (problemId) -> vaccinationScheduleRepository.find(),
-                vaccinationScheduleRepository::save);
+                vaccinationScheduleRepository::save, 
+                vaccinationScheduleRepository::persist, 
+                vaccinationScheduleRepository::handleException);
     }
 
     public SolverStatus getSolverStatus() {
