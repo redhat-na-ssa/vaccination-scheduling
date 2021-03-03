@@ -56,21 +56,19 @@ The OpenAPI documentation pertaining to these RESTful APIs are available by navi
 $ mvn clean package \
       -D skipTests \
       -Dquarkus.container-image.build=true \
-      -D quarkus.container-image.group=quay.io/jbride \
-      -D quarkus.container-image.tag=jbride-363f9f4-d136d956399
+      -D quarkus.container-image.group=quay.io/redhat_naps_da/vaccination_scheduling \
+      -D quarkus.container-image.tag=jbride-363f9f4-dc434ec07ba510c
 -----
 
 . push image
 +
 -----
-$ docker push quay.io/jbride/optaplanner-quarkus-vaccination-scheduler-quickstart:jbride-363f9f4-d136d956399
+$ docker push quay.io/redhat_naps_da/vaccination_scheduling:jbride-363f9f4-dc434ec07ba510c
 -----
 
 . Create IS
 +
 -----
-$ oc tag --source=docker \
-         quay.io/jbride/optaplanner-quarkus-vaccination-scheduler-quickstart \
-         p-vaccination:jbride-363f9f4-d136d956399
+$ oc import-image vaccination_scheduling --all=true --from=quay.io/redhat_naps_da/vaccination_scheduling --confirm
 -----
 

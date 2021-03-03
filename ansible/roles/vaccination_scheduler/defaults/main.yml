@@ -1,0 +1,20 @@
+psql_app_name: psql-vaccination
+postgresql_pv_capacity: 5Gi 
+postgresql_version: 12-el8
+postgresql_is_namespace: openshift
+postgresql_service_account: "{{ psql_app_name }}"
+psql_user_name: vaccine
+psql_user_passwd: vaccine
+psql_db_name: vaccine
+psql_credentials_secret: "{{ psql_app_name }}"
+postgresql_max_prepared_transactions: 100
+postgresql_max_connections: 100
+postgresql_memory_request: 256Mi
+postgresql_memory_limit: 512Mi
+postgresql_init_configmap: "{{ psql_app_name }}-init"
+psql_init_scripts:
+  - https://raw.githubusercontent.com/redhat-naps-da/vaccination-scheduling/master/src/main/resources/db/V1_appointment_table_create.sql
+postgresql_memory_limit: 512Mi
+postgresql_cpu_limit: 500m
+postgresql_memory_request: 256Mi
+postgresql_cpu_request: 100m
