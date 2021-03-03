@@ -11,12 +11,8 @@ import javax.ws.rs.core.Response;
 
 import org.acme.vaccinationscheduler.domain.Appointment;
 import org.acme.vaccinationscheduler.domain.AppointmentStatus;
-import org.acme.vaccinationscheduler.domain.Foo;
-import org.acme.vaccinationscheduler.domain.Hobbit;
-import org.acme.vaccinationscheduler.domain.HobbitDto;
 import org.acme.vaccinationscheduler.entity.AppointmentEntity;
 import org.acme.vaccinationscheduler.exception.ServiceException;
-import org.acme.vaccinationscheduler.mapping.HobbitMapper;
 import org.acme.vaccinationscheduler.service.AppointmentService;
 
 @Path("/appointment")
