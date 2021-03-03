@@ -16,14 +16,24 @@
 
 package org.acme.vaccinationscheduler.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
+import org.acme.vaccinationscheduler.domain.Injection;
 import org.acme.vaccinationscheduler.domain.VaccinationSchedule;
+import org.acme.vaccinationscheduler.mapping.AppointmentMapper;
+import org.acme.vaccinationscheduler.service.AppointmentService;
 
 @ApplicationScoped
 public class VaccinationScheduleRepository {
+	
+    @Inject
+    AppointmentService apptService;
+    @Inject
+    AppointmentMapper apptMapper;
 
     private VaccinationSchedule vaccinationSchedule;
 
@@ -33,6 +43,15 @@ public class VaccinationScheduleRepository {
 
     public void save(VaccinationSchedule vaccinationSchedule) {
         this.vaccinationSchedule = vaccinationSchedule;
+        //VaccinationSchedule sched = vaccinationScheduleRepository.find();
+		
+		  List<Injection> injections = vaccinationSchedule.getInjectionList();
+		  for(Injection i : injections) { 
+			  if(i!=null && i.getPerson()!=null && i.getId()!=null) { 
+				  apptService.saveOrUpdate(apptMapper.fromInjection(i));
+			  }
+		  }
+		 
     }
 
 }
