@@ -1,5 +1,37 @@
 ---
 
+- name: delete deployment config
+  oc_obj:
+    oc_binary: "{{ openshift_cli }}"
+    state: absent
+    name: "{{ application_name }}"
+    namespace: "{{ namespace }}"
+    kind: dc
+
+- name: delete service
+  oc_obj:
+    oc_binary: "{{ openshift_cli }}"
+    state: absent
+    name: "{{ application_name }}"
+    namespace: "{{ namespace }}"
+    kind: service
+
+- name: delete imagestream in the {{ namespace }} project
+  oc_obj:
+    oc_binary: "{{ openshift_cli }}"
+    state: absent
+    name: "{{ application_name }}"
+    namespace: "{{ namespace }}"
+    kind: imagestream
+
+- name: delete configmap
+  oc_obj:
+    oc_binary: "{{ openshift_cli }}"
+    state: absent
+    name: "{{ application_configmap }}"
+    namespace: "{{ namespace }}"
+    kind: configmap
+
 - name: delete postgresql dc
   oc_obj:
     oc_binary: "{{ openshift_cli }}"
@@ -35,7 +67,7 @@
   oc_configmap:
     oc_binary: "{{ openshift_cli }}"
     state: absent
-    name: "{{ psql_app_name }}"
+    name: "{{ postgresql_init_configmap }}"
     namespace: "{{ namespace }}"
 
 - name: delete {{ postgresql_service_account }} service account

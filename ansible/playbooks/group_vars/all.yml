@@ -12,4 +12,6 @@ project_admin: user1
 
 project_name: "v-scheduling-{{ project_admin }}"
 
+deploy_from: image
+
 

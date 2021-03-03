@@ -1,4 +1,6 @@
 psql_app_name: psql-vaccination
+application_name: v-scheduler
+
 postgresql_pv_capacity: 5Gi 
 postgresql_version: 12-el8
 postgresql_is_namespace: openshift
@@ -18,3 +20,12 @@ postgresql_memory_limit: 512Mi
 postgresql_cpu_limit: 500m
 postgresql_memory_request: 256Mi
 postgresql_cpu_request: 100m
+
+service_account: "{{ application_name }}"
+application_properties: application.properties
+application_configmap: "{{ application_name }}"
+application_configmap_key: "{{ application_properties }}"
+binary_imagestream_template: binary-imagestream.yml 
+service_image: quay.io/redhat_naps_da/vaccination_scheduling
+service_image_tag: jbride-363f9f4-2
+application_template: vaccination-scheduler-service.yml

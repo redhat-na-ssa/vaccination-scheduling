@@ -53,17 +53,13 @@ The OpenAPI documentation pertaining to these RESTful APIs are available by navi
 . build image
 +
 -----
-$ mvn clean package \
-      -D skipTests \
-      -Dquarkus.container-image.build=true \
-      -D quarkus.container-image.group=quay.io/redhat_naps_da/vaccination_scheduling \
-      -D quarkus.container-image.tag=jbride-363f9f4-dc434ec07ba510c
+$ podman build -f docker/Dockerfile -t quay.io/redhat_naps_da/vaccination_scheduling:jbride-363f9f4-2 . 
 -----
 
 . push image
 +
 -----
-$ docker push quay.io/redhat_naps_da/vaccination_scheduling:jbride-363f9f4-dc434ec07ba510c
+$ podman push quay.io/redhat_naps_da/vaccination_scheduling:jbride-363f9f4-2
 -----
 
 . Create IS
