@@ -1,5 +1,28 @@
 = Vaccination scheduling (Java, Quarkus, Maven)
 
+== Postgresql 
+
+A Postgresql database is needed to support this vaccination scheduling application.
+
+. A local containerized postgresql can be instantiated as follows:
++
+-----
+$ podman run -d \
+      --publish 5432:5432 \
+      --name psql_vaccine \
+      -e POSTGRESQL_USER=vaccine \
+      -e POSTGRESQL_PASSWORD=vaccine \
+      -e POSTGRESQL_DATABASE=vaccine \
+      -e POSTGRESQL_MAX_PREPARED_TRANSACTIONS=10 \
+      registry.redhat.io/rhel8/postgresql-12
+-----
+
+. Initialize the vaccine database of postgresql:
++
+-----
+$ psql -h 127.0.0.1 -U vaccine -d vaccine -a -f src/main/resources/db/V1_appointment_table_create.sql
+-----
+
 == Run the application with live coding
 
 . Start the application:
@@ -20,56 +43,12 @@ Then try _live coding_:
 
 Notice that those changes are immediately in effect.
 
-== Package and run the application
+== RESTful API
 
-When you're done iterating in `quarkus:dev` mode, run the application as a conventional jar file.
+The vaccination scheduling application exposes RESTful APIs.
+The OpenAPI documentation pertaining to these RESTful APIs are available by navigating in a browser to: http://localhost:8080/q/swagger-ui/
 
-. Compile it:
-+
-[source, shell]
-----
-$ mvn package
-----
-
-. Run it:
-+
-[source, shell]
-----
-$ java -jar ./target/*-runner.jar
-----
-+
-[NOTE]
-====
-To run it on port 8081 instead, add `-Dquarkus.http.port=8081`.
-====
-
-. Visit http://localhost:8080 in your browser.
-
-== Run a native executable
-
-. https://quarkus.io/guides/building-native-image#configuring-graalvm[Install GraalVM and gu install the native-image tool]
-
-. Compile it natively:
-+
-[source, shell]
-----
-$ mvn package -Dnative -DskipTests
-----
-
-. Run the native executable:
-+
-[source, shell]
-----
-$ ./target/*-runner
-----
-
-. Visit http://localhost:8080 in your browser.
-
-== More information
-
-Visit https://www.optaplanner.org/[www.optaplanner.org].
-
-== jbride notes
+== Deployment to OCP
 
 . build image
 +
@@ -78,13 +57,13 @@ $ mvn clean package \
       -D skipTests \
       -Dquarkus.container-image.build=true \
       -D quarkus.container-image.group=quay.io/jbride \
-      -D quarkus.container-image.tag=jbride-363f9f4
+      -D quarkus.container-image.tag=jbride-363f9f4-d136d956399
 -----
 
 . push image
 +
 -----
-$ docker push quay.io/jbride/optaplanner-quarkus-vaccination-scheduler-quickstart:jbride-363f9f4
+$ docker push quay.io/jbride/optaplanner-quarkus-vaccination-scheduler-quickstart:jbride-363f9f4-d136d956399
 -----
 
 . Create IS
@@ -92,6 +71,6 @@ $ docker push quay.io/jbride/optaplanner-quarkus-vaccination-scheduler-quickstar
 -----
 $ oc tag --source=docker \
          quay.io/jbride/optaplanner-quarkus-vaccination-scheduler-quickstart \
-         p-vaccination:jbride-363f9f4
+         p-vaccination:jbride-363f9f4-d136d956399
 -----
 
