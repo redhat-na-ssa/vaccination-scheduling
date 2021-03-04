@@ -79,9 +79,33 @@ $ ansible-playbook playbooks/threescale.yml \
 
 == Test
 
+. GET openapi in yaml format:
++
 -----
-$ wget https://stage-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/q/openapi?user_key=2603edadc49ff2fddc4de8b2490cefd6 \
+$ wget https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/q/openapi?user_key=2603edadc49ff2fddc4de8b2490cefd6 \
        -O openapi.yml
 -----
 
-. 
+. Start solver
++
+-----
+$ curl -v -X POST \
+       -H "Content-Type: application/json" \
+       https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/vaccinationSchedule/solve?user_key=2603edadc49ff2fddc4de8b2490cefd6
+-----
+
+. Stop solver
++
+-----
+$ curl -v -X POST \
+       -H "Content-Type: application/json" \
+       https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/vaccinationSchedule/stopSolving?user_key=2603edadc49ff2fddc4de8b2490cefd6
+-----
+
+. GET solution
++
+-----
+$ curl -v -X GET \
+       -H "Content-Type: application/json" \
+       https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/vaccinationSchedule?user_key=2603edadc49ff2fddc4de8b2490cefd6
+-----
