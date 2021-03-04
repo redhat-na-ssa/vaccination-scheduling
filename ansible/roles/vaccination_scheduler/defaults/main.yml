@@ -27,5 +27,5 @@ application_configmap: "{{ application_name }}"
 application_configmap_key: "{{ application_properties }}"
 binary_imagestream_template: binary-imagestream.yml 
 service_image: quay.io/redhat_naps_da/vaccination_scheduling
-service_image_tag: jbride-363f9f4-2
+service_image_tag: jbride-363f9f4-3
 application_template: vaccination-scheduler-service.yml

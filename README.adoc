@@ -48,18 +48,19 @@ Notice that those changes are immediately in effect.
 The vaccination scheduling application exposes RESTful APIs.
 The OpenAPI documentation pertaining to these RESTful APIs are available by navigating in a browser to: http://localhost:8080/q/swagger-ui/
 
-== Deployment to OCP
+== Vaccination Scheduling container image
 
 . build image
 +
 -----
-$ podman build -f docker/Dockerfile -t quay.io/redhat_naps_da/vaccination_scheduling:jbride-363f9f4-2 . 
+$ mvn clean package -DskipTests
+$ podman build -f docker/Dockerfile -t quay.io/redhat_naps_da/vaccination_scheduling:jbride-363f9f4-3 . 
 -----
 
 . push image
 +
 -----
-$ podman push quay.io/redhat_naps_da/vaccination_scheduling:jbride-363f9f4-2
+$ podman push quay.io/redhat_naps_da/vaccination_scheduling:jbride-363f9f4-3
 -----
 
 . Create IS
@@ -68,3 +69,19 @@ $ podman push quay.io/redhat_naps_da/vaccination_scheduling:jbride-363f9f4-2
 $ oc import-image vaccination_scheduling --all=true --from=quay.io/redhat_naps_da/vaccination_scheduling --confirm
 -----
 
+== Deployment to OCP
+
+-----
+$ ansible-playbook playbooks/threescale.yml \
+      -e threescale_portal_accesstoken=c06015d7fba524064feaf5ae6b24e1a8 \
+      -e threescale_portal_hostname=vplanner-admin.apps.rhtnckpmg.rhsledocp.com
+-----
+
+== Test
+
+-----
+$ wget https://stage-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/q/openapi?user_key=2603edadc49ff2fddc4de8b2490cefd6 \
+       -O openapi.yml
+-----
+
+. 

@@ -40,3 +40,13 @@
     files:
       - "{{ work_dir }}/{{ application_template }}"
   when: result.ansible_module_results.stderr is defined and result.ansible_module_results.stderr != ""
+
+- name: "wait until {{ application_name }} application is up and running"
+  shell: "{{ openshift_cli }} get dc {{ application_name }} -o template --template={{ json_template }} -n {{ namespace }}"
+  vars:
+    json_template: '\{\{.status.readyReplicas\}\}'
+  register: result
+  until: result.stdout == "1"
+  retries: 10
+  delay: 30
+  changed_when: false
