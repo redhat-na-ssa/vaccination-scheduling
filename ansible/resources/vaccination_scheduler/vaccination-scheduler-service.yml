@@ -104,6 +104,8 @@ items:
             volumeMounts:
             - mountPath: /deployments/config
               name: config
+            - mountPath: /deployments/seed_data
+              name: seed-data
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
@@ -119,6 +121,13 @@ items:
                 path: {{ application_configmap_key }}
             name: {{ application_configmap }}
           name: config
+        - configMap:
+            defaultMode: 420
+            items:
+              - key: {{ v_scheduling_seed_data_file }}
+                path: {{ v_scheduling_seed_data_file }}
+            name: {{ v_scheduling_seed_configmap }}
+          name: seed-data
     triggers:
       - type: ConfigChange
       - imageChangeParams:

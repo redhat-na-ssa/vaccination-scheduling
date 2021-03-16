@@ -90,7 +90,7 @@ public class DemoDataGenerator {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public void generateDemoData(@Observes StartupEvent startupEvent) throws JsonProcessingException, IOException {
+    public void loadSeedData(@Observes StartupEvent startupEvent) throws JsonProcessingException, IOException {
 
         InputStream fStream = this.getClass().getResourceAsStream(seedFilePath);
         if(fStream == null) {
@@ -100,6 +100,8 @@ public class DemoDataGenerator {
 
         VaccinationSchedule vSchedule = mapper.readValue(fStream, VaccinationSchedule.class);
         //VaccinationSchedule vSchedule = generateDemoVaccinationSchedule();
+
+        log.info("loadSeedData()  seed file path used: "+seedFilePath+"  ; # of injections in seed file: "+vSchedule.getInjectionList().size());
 
         boolean dumpSeedFileData = Boolean.parseBoolean(dumpSeedFileDataString);
         if(dumpSeedFileData) {

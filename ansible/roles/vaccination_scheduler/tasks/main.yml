@@ -117,6 +117,20 @@
     from_file:
       dir: "{{ work_dir }}/{{ application_properties }}"
 
+- name: "copy vaccination scheduling seed data file {{ v_scheduling_seed_data_file }}"
+  template:
+    src: "{{ resources_dir }}/{{ v_scheduling_seed_data_file }}"
+    dest: "{{ work_dir }}/{{ v_scheduling_seed_data_file }}"
+
+- name: create {{ v_scheduling_seed_configmap }} application configmap
+  oc_configmap:
+    oc_binary: "{{ openshift_cli }}"
+    state: present
+    name: "{{ v_scheduling_seed_configmap }}"
+    namespace: "{{ namespace }}"
+    from_file:
+      dir: "{{ work_dir }}/{{ v_scheduling_seed_data_file }}"
+
 - import_tasks: deploy_from_source.yml
   when: deploy_from is defined and deploy_from == "source"
 

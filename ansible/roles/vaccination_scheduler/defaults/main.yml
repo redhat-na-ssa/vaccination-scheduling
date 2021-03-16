@@ -29,3 +29,6 @@ binary_imagestream_template: binary-imagestream.yml
 service_image: quay.io/redhat_naps_da/vaccination_scheduling
 service_image_tag: jbride-363f9f4-3
 application_template: vaccination-scheduler-service.yml
+
+v_scheduling_seed_data_file: original_vaccination_schedule_mock.json
+v_scheduling_seed_configmap: "{{ application_name }}-seed-data"

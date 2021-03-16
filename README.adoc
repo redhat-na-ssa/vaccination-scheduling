@@ -66,15 +66,37 @@ $ podman push quay.io/redhat_naps_da/vaccination_scheduling:jbride-363f9f4-3
 . Create IS
 +
 -----
-$ oc import-image vaccination_scheduling --all=true --from=quay.io/redhat_naps_da/vaccination_scheduling --confirm
+$ oc import-image v-scheduler --all=true --from=quay.io/redhat_naps_da/vaccination_scheduling --confirm
 -----
 
 == Deployment to OCP
 
+Deployment to OCP is done in an automated, repeatable manner using ansible.
+The ansible is included in this project and deploys the following:
+
+* 3scale tenant
+* 3scale apicast gateways 
+* vaccination scheduling quarkus app and database
+
+. This section assumes that a 3scale tenant has already been created
+
+. Set an environment variable that captures the tenant admin access token:
++
+-----
+# Acquired as per the following in 3scale tenant:  `Gear Icon -> Personal Settings -> Tokens -> Access Tokens -> Add Access Token`
+$ tenant_admin_accesstoken=c06015d7fba524064feaf5ae6b24e1a8
+-----
+
+. Set an environment variable that captures the hostname of the 3scale admin portal:
++
+-----
+$ tenant_admin_hostname=vplanner-admin.apps.rhtnckpmg.rhsledocp.com
+-----
+
 -----
 $ ansible-playbook playbooks/threescale.yml \
-      -e threescale_portal_accesstoken=c06015d7fba524064feaf5ae6b24e1a8 \
-      -e threescale_portal_hostname=vplanner-admin.apps.rhtnckpmg.rhsledocp.com
+      -e threescale_portal_accesstoken=$tenant_admin_accesstoken \
+      -e threescale_portal_hostname=$tenant_admin_hostname
 -----
 
 == Test
