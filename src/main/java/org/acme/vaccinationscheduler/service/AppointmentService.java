@@ -34,6 +34,18 @@ public class AppointmentService {
 		return apptRepository.findByIdOptional(appointmentId).map(apptMapper::toDomain);
 	}
 	
+	public List<Appointment> findByVaccinationCenter(String vaccinationCenter) {
+		return apptRepository.findByVaccinationCenter(vaccinationCenter)
+				.stream().map(apptMapper::toDomain)
+				.collect(Collectors.toList());
+	}
+	
+	public List<Appointment> findByPersonId(Long personId) {
+		return apptRepository.findByPersonId(personId)
+				.stream().map(apptMapper::toDomain)
+				.collect(Collectors.toList());
+	}
+	
 	@Transactional
 	public Appointment save(Appointment appointment) {
 		AppointmentEntity entity = apptMapper.toEntity(appointment);

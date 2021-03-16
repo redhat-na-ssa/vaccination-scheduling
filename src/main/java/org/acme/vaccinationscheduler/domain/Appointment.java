@@ -11,7 +11,7 @@ public class Appointment {
     private Long personId;
     private String personName;
     private Boolean isFirstDoseAdministered;
-    private AppointmentStatus appointmentStatus;
+    private AppointmentProviderStatus appointmentStatus;
     
 	public VaccineType getVaccineType() {
 		return vaccineType;
@@ -55,10 +55,10 @@ public class Appointment {
 	public void setPersonName(String personName) {
 		this.personName = personName;
 	}
-	public AppointmentStatus getAppointmentStatus() {
+	public AppointmentProviderStatus getAppointmentStatus() {
 		return appointmentStatus;
 	}
-	public void setAppointmentStatus(AppointmentStatus appointmentStatus) {
+	public void setAppointmentStatus(AppointmentProviderStatus appointmentStatus) {
 		this.appointmentStatus = appointmentStatus;
 	}
 

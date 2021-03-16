@@ -1,6 +1,6 @@
 package org.acme.vaccinationscheduler.domain;
 
-public enum AppointmentStatus {
+public enum AppointmentProviderStatus {
     PROPOSED,
     SCHEDULED,
     STANDBY,
