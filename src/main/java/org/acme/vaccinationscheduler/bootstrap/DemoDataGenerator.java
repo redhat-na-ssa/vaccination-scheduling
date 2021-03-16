@@ -29,9 +29,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.IOException;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import org.acme.vaccinationscheduler.domain.Injection;
 import org.acme.vaccinationscheduler.domain.Location;
@@ -43,8 +48,20 @@ import org.acme.vaccinationscheduler.persistence.VaccinationScheduleRepository;
 
 import io.quarkus.runtime.StartupEvent;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import org.jboss.logging.Logger;
+
 @ApplicationScoped
 public class DemoDataGenerator {
+
+    private static final String SEED_DATA_FILE_PATH = "com.redhat.vaccination.scheduling.seed.file.path";
+    private static final String SEED_DATA_DUMP_TO_FILE = "com.redhat.vaccination.scheduling.seed.dump.to.file";
+    private static final String SEED_DATA_DUMP_PATH = "com.redhat.vaccination.scheduling.seed.dump.path";
+    private static Logger log = Logger.getLogger(DemoDataGenerator.class);
 
     // Latitude and longitude window of the city of Atlanta, US.
     public static final double MINIMUM_LATITUDE = 33.40;
@@ -59,10 +76,40 @@ public class DemoDataGenerator {
     public static final LocalDate MINIMUM_BIRTH_DATE = LocalDate.of(1930, 1, 1);
     public static final int BIRTH_DATE_RANGE_LENGTH = (int) DAYS.between(MINIMUM_BIRTH_DATE, LocalDate.of(2000, 1, 1));
 
+    @ConfigProperty(name = SEED_DATA_FILE_PATH)
+    private String seedFilePath;
+
+    @ConfigProperty(name = SEED_DATA_DUMP_TO_FILE, defaultValue="false")
+    private String dumpSeedFileDataString;
+
+    @ConfigProperty(name = SEED_DATA_DUMP_PATH, defaultValue="/tmp/vSchedule.json")
+    private String dumpSeedFilePath;
+
     @Inject
     VaccinationScheduleRepository vaccinationScheduleRepository;
 
-    public void generateDemoData(@Observes StartupEvent startupEvent) {
+    private ObjectMapper mapper = new ObjectMapper();
+
+    public void generateDemoData(@Observes StartupEvent startupEvent) throws JsonProcessingException, IOException {
+
+        InputStream fStream = this.getClass().getResourceAsStream(seedFilePath);
+        if(fStream == null) {
+            throw new RuntimeException("onStart() the following file does not exist:  "+seedFilePath);
+        }
+        mapper.registerModule(new JavaTimeModule());
+
+        VaccinationSchedule vSchedule = mapper.readValue(fStream, VaccinationSchedule.class);
+        //VaccinationSchedule vSchedule = generateDemoVaccinationSchedule();
+
+        boolean dumpSeedFileData = Boolean.parseBoolean(dumpSeedFileDataString);
+        if(dumpSeedFileData) {
+            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            mapper.writeValue(new File(dumpSeedFilePath), vSchedule);
+        }
+        vaccinationScheduleRepository.save(vSchedule);
+    }
+
+    private VaccinationSchedule generateDemoVaccinationSchedule() {
         LocalDate windowStartDate = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         int windowDaysLength = 5;
         LocalTime dayStartTime = LocalTime.of(9, 0);
@@ -126,7 +173,8 @@ public class DemoDataGenerator {
                 }
             }
         }
-        vaccinationScheduleRepository.save(new VaccinationSchedule(vaccineTypeList, vaccinationCenterList, timeslotDateTimeList, personList, injectionList));
+        VaccinationSchedule vSchedule = new VaccinationSchedule(vaccineTypeList, vaccinationCenterList, timeslotDateTimeList, personList, injectionList);
+        return vSchedule;
     }
 
     public Location pickLocation(Random random) {

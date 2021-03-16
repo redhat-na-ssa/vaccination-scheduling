@@ -79,10 +79,16 @@ $ ansible-playbook playbooks/threescale.yml \
 
 == Test
 
+. Set 3scale application userkey as an environment variable:
++
+-----
+$ API_APP_KEY=2603edadc49ff2fddc4de8b2490cefd6
+-----
+
 . GET openapi in yaml format:
 +
 -----
-$ wget https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/q/openapi?user_key=2603edadc49ff2fddc4de8b2490cefd6 \
+$ wget https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/q/openapi?user_key=$API_APP_KEY \
        -O openapi.yml
 -----
 
@@ -91,7 +97,7 @@ $ wget https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/q/op
 -----
 $ curl -v -X POST \
        -H "Content-Type: application/json" \
-       https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/vaccinationSchedule/solve?user_key=2603edadc49ff2fddc4de8b2490cefd6
+       https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/vaccinationSchedule/solve?user_key=$API_APP_KEY
 -----
 
 . Stop solver
@@ -99,7 +105,7 @@ $ curl -v -X POST \
 -----
 $ curl -v -X POST \
        -H "Content-Type: application/json" \
-       https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/vaccinationSchedule/stopSolving?user_key=2603edadc49ff2fddc4de8b2490cefd6
+       https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/vaccinationSchedule/stopSolving?user_key=$API_APP_KEY
 -----
 
 . GET solution
@@ -107,5 +113,15 @@ $ curl -v -X POST \
 -----
 $ curl -v -X GET \
        -H "Content-Type: application/json" \
-       https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/vaccinationSchedule?user_key=2603edadc49ff2fddc4de8b2490cefd6
+       https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/vaccinationSchedule?user_key=$API_APP_KEY
 -----
+
+== Bootstrapping a Vaccination Scheduling Runtime
+
+Prior to solving a vaccination scheduling problem, domain specific seed data must be parsed and made available to the planning engine.
+
+Example seed data is included in this project and found at the following:  `src/main/resources/mocks/original_vaccination_schedule_mock.json`
+
+The seed data is expected in a json representation.
+
+Different seed data can be made available to the planning engine via the following property:  `com.redhat.vaccination.scheduling.seed.file.path`
