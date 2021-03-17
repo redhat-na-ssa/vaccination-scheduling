@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Random;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 
@@ -92,16 +93,26 @@ public class DemoDataGenerator {
 
     public void loadSeedData(@Observes StartupEvent startupEvent) throws JsonProcessingException, IOException {
 
+        VaccinationSchedule vSchedule = null;
         InputStream fStream = this.getClass().getResourceAsStream(seedFilePath);
-        if(fStream == null) {
-            throw new RuntimeException("onStart() the following file does not exist:  "+seedFilePath);
+        try {
+            if(fStream == null) {
+                File vFile = new File(seedFilePath);
+                if(!vFile.exists()) {
+                    log.error("loadSeedData() the following file does not exist:  "+seedFilePath+" ;  will utilize original vaccination scheduling demo data to seed planning engine");
+                    throw new RuntimeException();
+                } else {
+                    fStream = new FileInputStream(vFile);
+                }
+            }
+            mapper.registerModule(new JavaTimeModule());
+            vSchedule = mapper.readValue(fStream, VaccinationSchedule.class);
+            log.info("loadSeedData()  seed file path used: "+seedFilePath+"  ; # of injections in seed file: "+vSchedule.getInjectionList().size());
+
+        }finally{
+            if(fStream != null)
+                fStream.close();
         }
-        mapper.registerModule(new JavaTimeModule());
-
-        VaccinationSchedule vSchedule = mapper.readValue(fStream, VaccinationSchedule.class);
-        //VaccinationSchedule vSchedule = generateDemoVaccinationSchedule();
-
-        log.info("loadSeedData()  seed file path used: "+seedFilePath+"  ; # of injections in seed file: "+vSchedule.getInjectionList().size());
 
         boolean dumpSeedFileData = Boolean.parseBoolean(dumpSeedFileDataString);
         if(dumpSeedFileData) {
