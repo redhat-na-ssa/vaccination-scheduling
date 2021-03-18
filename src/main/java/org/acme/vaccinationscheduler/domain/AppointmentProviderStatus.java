@@ -7,6 +7,7 @@ public enum AppointmentProviderStatus {
     CONFIRMED,
     CANCELLED_PROVIDER_SUPPLY,
     CANCELLED_NO_SHOW,
+    NOT_ADMINISTERED,
     COMPLETED
 
 }

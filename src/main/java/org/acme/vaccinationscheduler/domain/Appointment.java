@@ -11,8 +11,21 @@ public class Appointment {
     private Long personId;
     private String personName;
     private Boolean isFirstDoseAdministered;
-    private AppointmentProviderStatus appointmentStatus;
+    private AppointmentProviderStatus appointmentProviderStatus;
+    private AppointmentRecipientStatus appointmentRecipientStatus;
     
+	public AppointmentProviderStatus getAppointmentProviderStatus() {
+		return appointmentProviderStatus;
+	}
+	public void setAppointmentProviderStatus(AppointmentProviderStatus appointmentProviderStatus) {
+		this.appointmentProviderStatus = appointmentProviderStatus;
+	}
+	public AppointmentRecipientStatus getAppointmentRecipientStatus() {
+		return appointmentRecipientStatus;
+	}
+	public void setAppointmentRecipientStatus(AppointmentRecipientStatus appointmentRecipientStatus) {
+		this.appointmentRecipientStatus = appointmentRecipientStatus;
+	}
 	public VaccineType getVaccineType() {
 		return vaccineType;
 	}
@@ -54,12 +67,6 @@ public class Appointment {
 	}
 	public void setPersonName(String personName) {
 		this.personName = personName;
-	}
-	public AppointmentProviderStatus getAppointmentStatus() {
-		return appointmentStatus;
-	}
-	public void setAppointmentStatus(AppointmentProviderStatus appointmentStatus) {
-		this.appointmentStatus = appointmentStatus;
 	}
 
 }

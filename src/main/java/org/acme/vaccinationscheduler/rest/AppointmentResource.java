@@ -1,6 +1,5 @@
 package org.acme.vaccinationscheduler.rest;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +14,7 @@ import javax.ws.rs.core.Response;
 
 import org.acme.vaccinationscheduler.domain.Appointment;
 import org.acme.vaccinationscheduler.domain.AppointmentProviderStatus;
+import org.acme.vaccinationscheduler.domain.AppointmentRecipientStatus;
 import org.acme.vaccinationscheduler.service.AppointmentService;
 import org.jboss.logging.Logger;
 
@@ -70,7 +70,7 @@ public class AppointmentResource {
     public Response promoteToConfirmed(Appointment appointment){
 		Appointment appt = new Appointment();
 		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentStatus(AppointmentProviderStatus.CONFIRMED);
+		appt.setAppointmentProviderStatus(AppointmentProviderStatus.CONFIRMED);
 		apptService.updateNonNull(appt);
     	
         return Response.ok().build();
@@ -82,7 +82,7 @@ public class AppointmentResource {
     public Response appointmentCancelledNoSupply(Appointment appointment){
 		Appointment appt = new Appointment();
 		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentStatus(AppointmentProviderStatus.CANCELLED_PROVIDER_SUPPLY );
+		appt.setAppointmentProviderStatus(AppointmentProviderStatus.CANCELLED_PROVIDER_SUPPLY );
 		apptService.updateNonNull(appt);
     	
         return Response.ok().build();
@@ -94,7 +94,7 @@ public class AppointmentResource {
     public Response appointmentCanceledNoShow(Appointment appointment){
 		Appointment appt = new Appointment();
 		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentStatus(AppointmentProviderStatus.CANCELLED_NO_SHOW );
+		appt.setAppointmentProviderStatus(AppointmentProviderStatus.CANCELLED_NO_SHOW );
 		apptService.updateNonNull(appt);
     	
         return Response.ok().build();
@@ -106,7 +106,7 @@ public class AppointmentResource {
     public Response vaccineAdministered(Appointment appointment){
 		Appointment appt = new Appointment();
 		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentStatus(AppointmentProviderStatus.COMPLETED );
+		appt.setAppointmentProviderStatus(AppointmentProviderStatus.COMPLETED );
 		apptService.updateNonNull(appt);
     	
         return Response.ok().build();
@@ -118,7 +118,19 @@ public class AppointmentResource {
     public Response vaccineNotAdministered(Appointment appointment){
 		Appointment appt = new Appointment();
 		appt.setAppointmentId(appointment.getAppointmentId());
-		//appt.setAppointmentStatus(AppointmentProviderStatus.CONFIRMED );
+		appt.setAppointmentProviderStatus(AppointmentProviderStatus.NOT_ADMINISTERED );
+		apptService.updateNonNull(appt);
+    	
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/provider/vaccine/standby/")
+    public Response vaccineStandby(Appointment appointment){
+		Appointment appt = new Appointment();
+		appt.setAppointmentId(appointment.getAppointmentId());
+		appt.setAppointmentProviderStatus(AppointmentProviderStatus.STANDBY );
 		apptService.updateNonNull(appt);
     	
         return Response.ok().build();
@@ -135,7 +147,7 @@ public class AppointmentResource {
     public Response appointmentAcceptedByRecipient(Appointment appointment){
 		Appointment appt = new Appointment();
 		appt.setAppointmentId(appointment.getAppointmentId());
-		//appt.setAppointmentStatus(AppointmentProviderStatus.CONFIRMED );
+		appt.setAppointmentRecipientStatus(AppointmentRecipientStatus.CONFIRMED );
 		apptService.updateNonNull(appt);
     	
         return Response.ok().build();
@@ -147,7 +159,7 @@ public class AppointmentResource {
     public Response recipientVaccineAdministered(Appointment appointment){
 		Appointment appt = new Appointment();
 		appt.setAppointmentId(appointment.getAppointmentId());
-		//appt.setAppointmentStatus(AppointmentProviderStatus.CONFIRMED );
+		appt.setAppointmentRecipientStatus(AppointmentRecipientStatus.ADMINISTERED );
 		apptService.updateNonNull(appt);
     	
         return Response.ok().build();
@@ -159,7 +171,7 @@ public class AppointmentResource {
     public Response recipientVaccineNotAdministered(Appointment appointment){
 		Appointment appt = new Appointment();
 		appt.setAppointmentId(appointment.getAppointmentId());
-		//appt.setAppointmentStatus(AppointmentProviderStatus.CONFIRMED );
+		appt.setAppointmentRecipientStatus(AppointmentRecipientStatus.NOT_ADMINISTERED );
 		apptService.updateNonNull(appt);
     	
         return Response.ok().build();
@@ -171,7 +183,7 @@ public class AppointmentResource {
     public Response appointmentDeclinedByRecipient(Appointment appointment){
 		Appointment appt = new Appointment();
 		appt.setAppointmentId(appointment.getAppointmentId());
-		//appt.setAppointmentStatus(AppointmentProviderStatus.CONFIRMED );
+		appt.setAppointmentRecipientStatus(AppointmentRecipientStatus.DECLINED );
 		apptService.updateNonNull(appt);
     	
         return Response.ok().build();
@@ -183,7 +195,7 @@ public class AppointmentResource {
     public Response appointmentCancelledByRecipient(Appointment appointment){
 		Appointment appt = new Appointment();
 		appt.setAppointmentId(appointment.getAppointmentId());
-		//appt.setAppointmentStatus(AppointmentProviderStatus.CONFIRMED );
+		appt.setAppointmentRecipientStatus(AppointmentRecipientStatus.CANCELLED );
 		apptService.updateNonNull(appt);
     	
         return Response.ok().build();

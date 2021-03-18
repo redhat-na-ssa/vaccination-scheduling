@@ -4,8 +4,13 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.acme.vaccinationscheduler.domain.AppointmentProviderStatus;
+import org.acme.vaccinationscheduler.domain.AppointmentRecipientStatus;
 
 @Entity(name = "Appointment")
 @Table(name = "appointment")
@@ -26,9 +31,25 @@ public class AppointmentEntity {
     private String personName;
 	@Column(name = "is_first_dose_administered")
     private Boolean isFirstDoseAdministered;
-	@Column(name = "appointment_status")
-    private String appointmentStatus;
+	@Column(name = "appointment_provider_status")
+	@Enumerated(EnumType.STRING)
+    private AppointmentProviderStatus appointmentProviderStatus;
+	@Column(name= "appointment_recipient_status")
+	@Enumerated(EnumType.STRING)
+	private AppointmentRecipientStatus appointmentRecipientStatus;
 	
+	public AppointmentProviderStatus getAppointmentProviderStatus() {
+		return appointmentProviderStatus;
+	}
+	public void setAppointmentProviderStatus(AppointmentProviderStatus appointmentProviderStatus) {
+		this.appointmentProviderStatus = appointmentProviderStatus;
+	}
+	public AppointmentRecipientStatus getAppointmentRecipientStatus() {
+		return appointmentRecipientStatus;
+	}
+	public void setAppointmentRecipientStatus(AppointmentRecipientStatus appointmentRecipientStatus) {
+		this.appointmentRecipientStatus = appointmentRecipientStatus;
+	}
 	public String getVaccineType() {
 		return vaccineType;
 	}
@@ -70,12 +91,6 @@ public class AppointmentEntity {
 	}
 	public void setPersonName(String personName) {
 		this.personName = personName;
-	}
-	public String getAppointmentStatus() {
-		return appointmentStatus;
-	}
-	public void setAppointmentStatus(String appointmentStatus) {
-		this.appointmentStatus = appointmentStatus;
 	}
 
 }

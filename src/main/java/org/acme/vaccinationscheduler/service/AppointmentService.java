@@ -63,7 +63,8 @@ public class AppointmentService {
 			throw new ServiceException(String.format("No appointment found for appointmentId[%s]", appointment.getAppointmentId()));
 		}
 		AppointmentEntity entity = optional.get();
-		entity.setAppointmentStatus(appointment.getAppointmentStatus()==null?null:appointment.getAppointmentStatus().toString());
+		entity.setAppointmentProviderStatus(appointment.getAppointmentProviderStatus());
+		entity.setAppointmentRecipientStatus(appointment.getAppointmentRecipientStatus());
 		entity.setIsFirstDoseAdministered(appointment.getIsFirstDoseAdministered());
 		entity.setPersonId(appointment.getPersonId());
 		entity.setPersonName(appointment.getPersonName());
@@ -84,8 +85,10 @@ public class AppointmentService {
 			throw new ServiceException(String.format("No appointment found for appointmentId[%s]", appointment.getAppointmentId()));
 		}
 		AppointmentEntity entity = optional.get();
-		if(appointment.getAppointmentStatus()!=null)
-			entity.setAppointmentStatus(appointment.getAppointmentStatus().toString());
+		if(appointment.getAppointmentProviderStatus()!=null)
+			entity.setAppointmentProviderStatus(appointment.getAppointmentProviderStatus());
+		if(appointment.getAppointmentRecipientStatus()!=null)
+			entity.setAppointmentRecipientStatus(appointment.getAppointmentRecipientStatus());
 		if(appointment.getIsFirstDoseAdministered()!=null)
 			entity.setIsFirstDoseAdministered(appointment.getIsFirstDoseAdministered());
 		if(appointment.getPersonId()!=null)

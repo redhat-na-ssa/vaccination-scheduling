@@ -6,5 +6,6 @@ create table appointment (
 	person_id BIGINT, 
 	person_name VARCHAR(100), 
 	is_first_dose_administered BOOLEAN, 
-	appointment_status VARCHAR(100)
+	appointment_provider_status VARCHAR(100),
+	appointment_recipient_status VARCHAR(100)
 );
