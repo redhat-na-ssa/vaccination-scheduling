@@ -1,6 +1,43 @@
-= Vaccination scheduling (Java, Quarkus, Maven)
+:scrollbar:
+:data-uri:
+:toc2:
+:linkattrs:
 
-== Postgresql 
+= Vaccination Scheduling 
+:numbered:
+
+== Overview
+
+The purpose of this guide is to provide technical documentation on the Red Hat vaccine scheduling demo.
+
+Other related documentation and project management can be found as follows:
+
+. link:https://docs.google.com/document/d/1q5WpnbfVyXq52lz2Wmd09m-ABWb0yoZqf7p73D5cjSA/edit[Design Doc]
+. link:https://issues.redhat.com/browse/NAPSSS-12[Issues / Project Mgmt]
+. link:https://trello.com/c/8qaUwRM2/66-vaccine-optaplanner-solution-architecture-and-demo[Trello Status]
+
+== Demo Script
+
+TO_DO
+
+== Technologies
+
+. Red Hat Build of Quarkus
+. SmallRye
+. PostgreSQL
+. Optaplanner
+. Maven
+. Ansible
+. OpenShift Container Platform
+. 3scale API Management
+. Swagger / OpenAPI
+. Podman
+. link:quay.io/redhat_naps_da/vaccination_scheduling[Quay]
+
+
+== Local Dev Environment
+
+=== Postgresql 
 
 A Postgresql database is needed to support this vaccination scheduling application.
 
@@ -23,7 +60,7 @@ $ podman run -d \
 $ psql -h 127.0.0.1 -U vaccine -d vaccine -a -f src/main/resources/db/V1_appointment_table_create.sql
 -----
 
-== Run the application with live coding
+=== Run the application with live coding
 
 . Start the application:
 +
@@ -43,12 +80,15 @@ Then try _live coding_:
 
 Notice that those changes are immediately in effect.
 
-== RESTful API
+=== RESTful API
 
 The vaccination scheduling application exposes RESTful APIs.
+
 The OpenAPI documentation pertaining to these RESTful APIs are available by navigating in a browser to: http://localhost:8080/q/swagger-ui/
 
-== Vaccination Scheduling container image
+== Packaging and Deployment to OCP
+
+=== Vaccination Scheduling container image
 
 . build image
 +
@@ -69,7 +109,7 @@ $ podman push quay.io/redhat_naps_da/vaccination_scheduling:jbride-363f9f4-3
 $ oc import-image v-scheduler --all=true --from=quay.io/redhat_naps_da/vaccination_scheduling --confirm
 -----
 
-== Deployment to OCP
+=== Deployment to OCP
 
 Deployment to OCP is done in an automated, repeatable manner using ansible.
 The ansible is included in this project and deploys the following:
@@ -99,7 +139,7 @@ $ ansible-playbook playbooks/threescale.yml \
       -e threescale_portal_hostname=$tenant_admin_hostname
 -----
 
-== Test
+=== Test
 
 . Set 3scale application userkey as an environment variable:
 +
@@ -138,7 +178,7 @@ $ curl -v -X GET \
        https://prod-apicast-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/vaccinationSchedule?user_key=$API_APP_KEY
 -----
 
-== Bootstrapping a Vaccination Scheduling Runtime
+== Bootstrap a Vaccine Scheduling Runtime w/ Demo Data
 
 Prior to solving a vaccination scheduling problem, domain specific seed data must be parsed and made available to the planning engine.
 
@@ -146,4 +186,8 @@ Example seed data is included in this project and found at the following:  `src/
 
 The seed data is expected in a json representation.
 
-Different seed data can be made available to the planning engine via the following property:  `com.redhat.vaccination.scheduling.seed.file.path`
+Different seed data can be made available to the planning engine via the following java system property:  `com.redhat.vaccination.scheduling.seed.file.path`
+
+When deploying the vaccination scheduling demo to openshift via ansible, the link:https://github.com/redhat-naps-da/vaccination-scheduling/blob/master/ansible/roles/vaccination_scheduler/defaults/main.yml#L33[v_scheduling_seed_data_file] property defines the json data file to load.
+
+
