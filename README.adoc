@@ -18,7 +18,35 @@ Other related documentation and project management can be found as follows:
 
 == Demo Script
 
-TO_DO
+The purpose of this section is to document the registration to and utilization of the  _Vaccination Scheduling_ APIs provided in this project.
+
+This section assumes the use of the _Valkyrie_ environment.
+Login credentials to the 3scale environment can be found on the last page of the link:https://docs.google.com/document/d/1q5WpnbfVyXq52lz2Wmd09m-ABWb0yoZqf7p73D5cjSA/edit[Design Doc]. 
+
+=== API Consumer Registration
+3scale allows for a customizable sign-up flows for API consumers.
+
+The sign-up flow of API consumers currently implemented involves having the API Consumer register for an account and then creating a new _Application_ from the _default_ _Application Plan_.
+
+The steps for an API Consumer to do so are as follows:
+
+. Navigate to the Dev Portal of the 3scale Tenant and click the link:
+. Complete the registration form using a valid email address.  Example as follows:
++
+image::doc/images/dev_portal_registration_form.png[]
+
+. An account validation email will have been sent.  Click the link in the email to activate the account
++
+image::doc/images/email_validation.png[]
+
+. Using the credentials previously submitted, log into the 3scale Developer Portal as the newly activated API Consumer
++
+image::doc/images/dev_portal_login.png[]
+
+=== API _Application_
+=== Approval of API _Application_
+=== Vaccination Scheduling APIs via _Active Docs_
+=== API Usage Statistics
 
 == Technologies
 
@@ -85,6 +113,15 @@ Notice that those changes are immediately in effect.
 The vaccination scheduling application exposes RESTful APIs.
 
 The OpenAPI documentation pertaining to these RESTful APIs are available by navigating in a browser to: http://localhost:8080/q/swagger-ui/
+
+The yaml representation of this OpenAPI documentation can be downloaded via:  http://localhost:8080/q/openapi
+
+To create 3scale _Active Docs_ from this OpenAPI, the JSON representation of the openapi documentation is needed.
+This JSON representation can be retrieved as follows:
+
+. Navigate to: https://editor.swagger.io/
+. File -> Import File  (Import the yaml formatted openapi previously downloaded from http://localhost:8080/q/openapi )
+. File -> Convert and save as JSON
 
 == Packaging and Deployment to OCP
 
