@@ -30,21 +30,63 @@ The sign-up flow of API consumers currently implemented involves having the API 
 
 The steps for an API Consumer to do so are as follows:
 
-. Navigate to the Dev Portal of the 3scale Tenant and click the link:
-. Complete the registration form using a valid email address.  Example as follows:
+. Navigate to the Dev Portal of the 3scale Tenant and click the link: _Register for access to Vaccination Schedule APIs_ .
+. Complete the registration form using a valid email address and press `Sign Up`.  Example as follows:
 +
 image::doc/images/dev_portal_registration_form.png[]
 
-. An account validation email will have been sent.  Click the link in the email to activate the account
+. An account validation email will be sent.
+Click the link in the email to activate the account
 +
 image::doc/images/email_validation.png[]
+
+An email will also have been sent to the API administrator to approve your request for access to the API.
+
+=== Account Approval
+As the API administrator, you need to approve or deny requests for access to the _Vaccination Scheduling_ API.
+
+You can do so by clicking the `Approve` button in the `Signup` email:
+
+image::doc/images/approve_account_email.png[]
+
+Alternatively, you can approve or reject the account via the Admin Portal of your 3scale tenant:
+
+. Navigate to the Admin Portal of your 3scale _tenant_ and authenticate in as admin.
+. Navigate to: `Audience -> Accounts -> Listing`
+. Locate the new `unapproved` account and click on its group name.
+. Approve or reject the account as necessary:
++
+image::doc/images/approve_account.png[]
+
+
+
+
+
+=== API _Application_
+
+
+To gain access to the _Vaccination Scheduling_ APIs, you (as an API Consumer) will need an API Mgmt _Application_ assigned to you.  You can create an _application_ as follows:
 
 . Using the credentials previously submitted, log into the 3scale Developer Portal as the newly activated API Consumer
 +
 image::doc/images/dev_portal_login.png[]
+. In the Developer Portal, click the button: _Create Application_ .
+. In the subsequent page, click the link: _Subscribe to vPlanner-product_
++
+image::doc/images/subscribe_product.png[]
+. You have now subscribed to the API _service_ and can now create an API application.
++
+Navigate to `Applications -> Create new application` and fill in the form as appropriate:
++
+image::doc/images/apply_application.png[]
++
+Click `Create Application`
 
-=== API _Application_
-=== Approval of API _Application_
+. The subequent page provides details of your API _application_.  Save the _User Key_ .  You will use it to invoke the _Vaccination Scheduling_ APIs.
++
+image::doc/images/new_app.png[]
+
+
 === Vaccination Scheduling APIs via _Active Docs_
 === API Usage Statistics
 
