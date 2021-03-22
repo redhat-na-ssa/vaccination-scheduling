@@ -1,0 +1,815 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Generated API",
+    "version": "1.0"
+  },
+  "paths": {
+    "/appointment/getByAppointmentId/{appointmentId}": {
+      "get": {
+        "parameters": [
+          {
+            "name": "appointmentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/appointment/getByPersonId/{personId}": {
+      "get": {
+        "parameters": [
+          {
+            "name": "personId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/appointment/getByVaccinationCenter/{vaccinationCenter}": {
+      "get": {
+        "parameters": [
+          {
+            "name": "vaccinationCenter",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/appointment/provider/cancelled/noshow": {
+      "put": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Appointment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/appointment/provider/cancelled/supply": {
+      "put": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Appointment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/appointment/provider/promote/confirmed": {
+      "put": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Appointment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/appointment/provider/vaccine/administered": {
+      "put": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Appointment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/appointment/provider/vaccine/notadministered": {
+      "put": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Appointment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/appointment/provider/vaccine/standby": {
+      "put": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Appointment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/appointment/recipient/accepted": {
+      "put": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Appointment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/appointment/recipient/cancelled": {
+      "put": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Appointment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/appointment/recipient/declined": {
+      "put": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Appointment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/appointment/recipient/vaccine/administered": {
+      "put": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Appointment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/appointment/recipient/vaccine/notadministered": {
+      "put": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Appointment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/recipient/request/add": {
+      "post": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Person"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/recipient/request/update": {
+      "put": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Person"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/vaccinationSchedule": {
+      "get": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VaccinationSchedule"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vaccinationSchedule/solve": {
+      "post": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/vaccinationSchedule/stopSolving": {
+      "post": {
+        "parameters": [
+          {
+            "name": "user_key",
+            "description": "Your access API Key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-data-threescale-name": "app_keys"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "VaccineType": {
+        "enum": [
+          "ASTRAZENECA",
+          "MODERNA",
+          "PFIZER"
+        ],
+        "type": "string"
+      },
+      "Location": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "format": "double",
+            "type": "number"
+          },
+          "longitude": {
+            "format": "double",
+            "type": "number"
+          }
+        }
+      },
+      "Person": {
+        "type": "object",
+        "properties": {
+          "age": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "birthdate": {
+            "format": "date",
+            "type": "string"
+          },
+          "firstShotInjected": {
+            "type": "boolean"
+          },
+          "firstShotVaccineType": {
+            "$ref": "#/components/schemas/VaccineType"
+          },
+          "homeLocation": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "secondShotIdealDate": {
+            "format": "date",
+            "type": "string"
+          }
+        }
+      },
+      "AppointmentProviderStatus": {
+        "enum": [
+          "CANCELLED_NO_SHOW",
+          "CANCELLED_PROVIDER_SUPPLY",
+          "COMPLETED",
+          "CONFIRMED",
+          "NOT_ADMINISTERED",
+          "PROPOSED",
+          "SCHEDULED",
+          "STANDBY"
+        ],
+        "type": "string"
+      },
+      "AppointmentRecipientStatus": {
+        "enum": [
+          "ADMINISTERED",
+          "CANCELLED",
+          "COMPLETED",
+          "CONFIRMED",
+          "DECLINED",
+          "NOT_ADMINISTERED",
+          "PROPOSED"
+        ],
+        "type": "string"
+      },
+      "Appointment": {
+        "type": "object",
+        "properties": {
+          "appointmentId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "appointmentProviderStatus": {
+            "$ref": "#/components/schemas/AppointmentProviderStatus"
+          },
+          "appointmentRecipientStatus": {
+            "$ref": "#/components/schemas/AppointmentRecipientStatus"
+          },
+          "isFirstDoseAdministered": {
+            "type": "boolean"
+          },
+          "personId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "personName": {
+            "type": "string"
+          },
+          "timeslotDateTime": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "vaccinationCenterName": {
+            "type": "string"
+          },
+          "vaccineType": {
+            "$ref": "#/components/schemas/VaccineType"
+          }
+        }
+      },
+      "Injection": {
+        "type": "object",
+        "properties": {
+          "dateTime": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "lineIndex": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "person": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "pinned": {
+            "type": "boolean"
+          },
+          "vaccinationCenter": {
+            "$ref": "#/components/schemas/VaccinationCenter"
+          },
+          "vaccineType": {
+            "$ref": "#/components/schemas/VaccineType"
+          }
+        }
+      },
+      "ListInjection": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Injection"
+        }
+      },
+      "ListPerson": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Person"
+        }
+      },
+      "HardMediumSoftLongScore": {
+        "type": "object",
+        "properties": {
+          "initScore": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "initPrefix": {
+            "type": "string"
+          },
+          "solutionInitialized": {
+            "type": "boolean"
+          },
+          "hardScore": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "mediumScore": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "softScore": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "feasible": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SolverStatus": {
+        "enum": [
+          "NOT_SOLVING",
+          "SOLVING_ACTIVE",
+          "SOLVING_SCHEDULED"
+        ],
+        "type": "string"
+      },
+      "ListLocalDateTime": {
+        "type": "array",
+        "items": {
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "VaccinationCenter": {
+        "type": "object",
+        "properties": {
+          "lineCount": {
+            "format": "int32",
+            "type": "integer"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ListVaccinationCenter": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/VaccinationCenter"
+        }
+      },
+      "ListVaccineType": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/VaccineType"
+        }
+      },
+      "VaccinationSchedule": {
+        "type": "object",
+        "properties": {
+          "injectionList": {
+            "$ref": "#/components/schemas/ListInjection"
+          },
+          "personList": {
+            "$ref": "#/components/schemas/ListPerson"
+          },
+          "score": {
+            "$ref": "#/components/schemas/HardMediumSoftLongScore"
+          },
+          "solverStatus": {
+            "$ref": "#/components/schemas/SolverStatus"
+          },
+          "timeslotDateTimeList": {
+            "$ref": "#/components/schemas/ListLocalDateTime"
+          },
+          "vaccinationCenterList": {
+            "$ref": "#/components/schemas/ListVaccinationCenter"
+          },
+          "vaccineTypeList": {
+            "$ref": "#/components/schemas/ListVaccineType"
+          }
+        }
+      }
+    }
+  }
+}
