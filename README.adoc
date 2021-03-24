@@ -88,6 +88,13 @@ image::doc/images/new_app.png[]
 
 
 === Vaccination Scheduling APIs via _Active Docs_
+
+Below is a link to the screenshots, in order of which comes first. 
+The "only-id-alternative" one to demonstrate that you can remove all the other fields from the appointment payload, and only send the id (all other fields will be NULL, in that case) since it would probably look better in a demo. I also highlighted what needs to be clicked/modified in some of the screenshots by enclosing them in a red rectangle.
+
+https://drive.google.com/drive/folders/17UHdSas1BE5gtwUcxaRroxmPyVWuYc_C?usp=sharing
+
+
 === API Usage Statistics
 
 == Technologies
