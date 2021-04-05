@@ -277,3 +277,27 @@ Different seed data can be made available to the planning engine via the followi
 When deploying the vaccination scheduling demo to openshift via ansible, the link:https://github.com/redhat-naps-da/vaccination-scheduling/blob/master/ansible/roles/vaccination_scheduler/defaults/main.yml#L33[v_scheduling_seed_data_file] property defines the json data file to load.
 
 
+
+== 3scale Tenant Admin Settings
+
+. Service Plans
++
+A service plan is set up to autocreate an application once an account has been approved: 
++
+image::doc/default_service_plan.png[]
+
+. API backends
++
+image::doc/api_backends.png[]
+
+. API Deployment Settings
++
+image::doc/api_deployment_settings.png[]
+
+. Mapping Rules
++
+image::doc/mapping_rules.png[]
+
+. Dev Portal Feature Visibility
++
+image::doc/dev_portal_feature_vis.png[]
