@@ -33,10 +33,14 @@ import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.solver.SolverManager;
 import org.optaplanner.core.api.solver.SolverStatus;
 
+import org.jboss.logging.Logger;
+
 @Path("vaccinationSchedule")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class VaccinationScheduleSolverResource {
+
+    private static Logger log = Logger.getLogger(VaccinationScheduleSolverResource.class);
 
     @Inject
     VaccinationScheduleRepository vaccinationScheduleRepository;
@@ -61,6 +65,7 @@ public class VaccinationScheduleSolverResource {
     @POST
     @Path("solve")
     public void solve() {
+        log.info("solve() ... ");        
         solverManager.solveAndListen(1L,
                 (problemId) -> vaccinationScheduleRepository.find(),
                 vaccinationScheduleRepository::save, 
@@ -75,6 +80,7 @@ public class VaccinationScheduleSolverResource {
     @POST
     @Path("stopSolving")
     public void stopSolving() {
+        log.info("stopSolving() ... ");        
         solverManager.terminateEarly(1L);
     }
 
