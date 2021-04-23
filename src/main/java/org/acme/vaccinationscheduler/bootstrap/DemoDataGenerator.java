@@ -93,6 +93,10 @@ public class DemoDataGenerator {
 
     public void loadSeedData(@Observes StartupEvent startupEvent) throws JsonProcessingException, IOException {
 
+        // No longer used
+        if(true)
+          return;
+
         VaccinationSchedule vSchedule = null;
         InputStream fStream = this.getClass().getResourceAsStream(seedFilePath);
         try {

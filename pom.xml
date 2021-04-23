@@ -44,6 +44,11 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-client</artifactId>
+    </dependency>
+
     <!-- Expose service endpoints through Swagger/OpenAPI -->
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -53,11 +58,13 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-jackson</artifactId>
     </dependency>
+
     <!-- Hibernate ORM dependency -->
     <dependency>
     	<groupId>io.quarkus</groupId>
     	<artifactId>quarkus-hibernate-orm-panache</artifactId>
     </dependency>
+
     <!-- JDBC driver dependencies -->
     <dependency>
     	<groupId>io.quarkus</groupId>
@@ -75,6 +82,7 @@
       <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-quarkus-jackson</artifactId>
     </dependency>
+    
     <!-- MapStruct bean mapper -->
     <dependency>
     	<groupId>org.mapstruct</groupId>
@@ -99,6 +107,13 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-health</artifactId>
+    </dependency>
+
+    <!-- FHIR R4 Patient Data Generator -->
+    <dependency>
+      <groupId>org.mitre.synthea</groupId>
+      <artifactId>synthea</artifactId>
+      <version>2.7.0</version>
     </dependency>
 
     <!-- Testing -->
