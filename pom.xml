@@ -16,6 +16,7 @@
     <maven.compiler.release>11</maven.compiler.release>
     <surefire-plugin.version>2.22.2</surefire-plugin.version>
     <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
+    <hapi.fhir.version>5.3.0</hapi.fhir.version>
   </properties>
 
   <dependencyManagement>
@@ -137,6 +138,14 @@
       <groupId>org.optaplanner</groupId>
       <artifactId>optaplanner-test</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <!-- HAPI FHIR resources -->
+    <!-- https://github.com/hapifhir/hapi-fhir/tree/master/hapi-fhir-structures-r4 -->
+    <dependency>
+      <groupId>ca.uhn.hapi.fhir</groupId>
+      <artifactId>hapi-fhir-structures-r4</artifactId>
+      <version>${hapi.fhir.version}</version>
     </dependency>
 
     <!-- UI -->
