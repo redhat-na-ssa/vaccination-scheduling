@@ -78,13 +78,13 @@ public class DemoDataGenerator {
     public static final int BIRTH_DATE_RANGE_LENGTH = (int) DAYS.between(MINIMUM_BIRTH_DATE, LocalDate.of(2000, 1, 1));
 
     @ConfigProperty(name = SEED_DATA_FILE_PATH)
-    private String seedFilePath;
+    String seedFilePath;
 
     @ConfigProperty(name = SEED_DATA_DUMP_TO_FILE, defaultValue="false")
-    private String dumpSeedFileDataString;
+    String dumpSeedFileDataString;
 
     @ConfigProperty(name = SEED_DATA_DUMP_PATH, defaultValue="/tmp/vSchedule.json")
-    private String dumpSeedFilePath;
+    String dumpSeedFilePath;
 
     @Inject
     VaccinationScheduleRepository vaccinationScheduleRepository;
