@@ -141,7 +141,7 @@ public class FhirServerTest {
         // GET
         Response gResponse = null;
         try {
-            gResponse = fhirClient.getOrganization();
+            gResponse = fhirClient.getOrganizations();
             assertTrue(gResponse.getStatus() == 200 || gResponse.getStatus() == 201);
             String orgJson = IOUtils.toString((InputStream)gResponse.getEntity(), "UTF-8");
             Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, orgJson);
