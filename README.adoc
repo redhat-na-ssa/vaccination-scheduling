@@ -310,3 +310,25 @@ image::doc/dev_portal_feature_vis.png[]
 . AppointmentStatus   -> https://www.hl7.org/fhir/valueset-appointmentstatus.html
 . VaccinationStatus   -> https://www.hl7.org/fhir/valueset-immunization-status.html
 . Injection           -> https://www.hl7.org/fhir/immunization.html
+
+=== FHIR Server Image for OCP
+
+https://github.com/jbride/hapi-fhir-jpaserver-starter/blob/ocp/Dockerfile.ocp
+
+=== FHIR Server swagger 
+
+. fhir-swagger
++
+-----
+https://github.com/rbren/fhir-swagger
+-----
+
+. Generate:
++
+-----
+$ fhir-swagger \
+    --fhir_url "http://fhir-server-v-scheduling-user1.apps.rhtnckpmg.rhsledocp.com/fhir" \
+    --conformance_path="/metadata?_format=application/json" \
+    --r4 \
+    --output target/fhir-server-swagger.json
+-----
