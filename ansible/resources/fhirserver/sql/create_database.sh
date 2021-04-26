@@ -8,7 +8,7 @@ pushd "$(dirname "$(readlink -f "$BASH_SOURCE")")" > /dev/null && {
     popd > /dev/null
 }   
 
-echo "creating erdemo datawarehouse database"
+echo "creating FHIR Server database"
 
 psql -h $POSTGRESQL_SERVICE -d $POSTGRESQL_DATABASE -U $POSTGRESQL_USER -w -c "grant all privileges on database ${POSTGRESQL_DATABASE} to ${POSTGRESQL_USER};"
-psql -h $POSTGRESQL_SERVICE -d $POSTGRESQL_DATABASE -U $POSTGRESQL_USER -w < ${SCRIPT_DIR}/V1_appointment_table_create.sql
+# psql -h $POSTGRESQL_SERVICE -d $POSTGRESQL_DATABASE -U $POSTGRESQL_USER -w < ${SCRIPT_DIR}/V1_appointment_table_create.sql
