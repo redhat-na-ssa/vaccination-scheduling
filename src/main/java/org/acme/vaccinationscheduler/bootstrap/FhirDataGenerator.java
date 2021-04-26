@@ -11,6 +11,8 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import io.quarkus.runtime.StartupEvent;
+
+import org.acme.vaccinationscheduler.util.FhirUtil;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
@@ -26,8 +28,7 @@ public class FhirDataGenerator {
     private static final String PATIENT_GENERATOR_STATE="com.redhat.vaccination.scheduling.patientGeneratorState";
     private static final String PATIENT_GENERATOR_CITY="com.redhat.vaccination.scheduling.patientGeneratorCity";
     private static final String PATIENT_GENERATOR_BASE_DIR="com.redhat.vaccination.scheduling.patientGeneratorBaseDir";
-    private static final String HOSPITAL_INFORMATION="hospitalInformation";
-    private static final String PRACTITIONER_INFORMATION="practitionerInformation";
+
 
     @Inject
     @ConfigProperty(name = GENERATE_PATIENTS, defaultValue = "false")
@@ -100,9 +101,9 @@ public class FhirDataGenerator {
             File[] files = outputDirFile.listFiles();
             log.info("The following # of files have been found in "+outputDirFile.getAbsolutePath()+" : "+files.length);
             for(File file : files) {
-                if(file.getName().startsWith(HOSPITAL_INFORMATION)){
+                if(file.getName().startsWith(FhirUtil.HOSPITAL_INFORMATION)){
                     log.info("found hospital file: "+ file.getAbsolutePath());
-                }else if (file.getName().startsWith(PRACTITIONER_INFORMATION)){
+                }else if (file.getName().startsWith(FhirUtil.PRACTITIONER_INFORMATION)){
                     log.info("found practitioner file: "+ file.getAbsolutePath());
                 }else{
                     log.info("skipping the following file: "+file.getAbsolutePath());

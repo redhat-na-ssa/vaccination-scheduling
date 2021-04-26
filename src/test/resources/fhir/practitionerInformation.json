@@ -1,0 +1,326 @@
+{
+  "resourceType": "Bundle",
+  "type": "batch",
+  "entry": [ {
+    "fullUrl": "urn:uuid:69aefdb5-cf5e-3114-8d1d-db6d8e711c0c",
+    "resource": {
+      "resourceType": "Practitioner",
+      "id": "69aefdb5-cf5e-3114-8d1d-db6d8e711c0c",
+      "meta": {
+        "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner" ]
+      },
+      "extension": [ {
+        "url": "http://synthetichealth.github.io/synthea/utilization-encounters-extension",
+        "valueInteger": 1
+      } ],
+      "identifier": [ {
+        "system": "http://hl7.org/fhir/sid/us-npi",
+        "value": "9999999899"
+      } ],
+      "active": true,
+      "name": [ {
+        "family": "Upton904",
+        "given": [ "Isaac321" ],
+        "prefix": [ "Dr." ]
+      } ],
+      "telecom": [ {
+        "extension": [ {
+          "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-direct",
+          "valueBoolean": true
+        } ],
+        "system": "email",
+        "value": "Isaac321.Upton904@example.com",
+        "use": "work"
+      } ],
+      "address": [ {
+        "line": [ "6071 W OUTER DRIVE" ],
+        "city": "DETROIT",
+        "state": "MI",
+        "postalCode": "48235",
+        "country": "US"
+      } ],
+      "gender": "male"
+    },
+    "request": {
+      "method": "POST",
+      "url": "Practitioner",
+      "ifNoneExist": "identifier=http://hl7.org/fhir/sid/us-npi|9999999899"
+    }
+  }, {
+    "fullUrl": "urn:uuid:d805c221-51ca-e9ac-c235-67ad29d2cdd3",
+    "resource": {
+      "resourceType": "PractitionerRole",
+      "id": "d805c221-51ca-e9ac-c235-67ad29d2cdd3",
+      "meta": {
+        "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole" ]
+      },
+      "practitioner": {
+        "identifier": {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "value": "9999999899"
+        },
+        "display": "Dr. Isaac321 Upton904"
+      },
+      "organization": {
+        "identifier": {
+          "system": "https://github.com/synthetichealth/synthea",
+          "value": "c5f5f12b-15c2-3aca-995a-90c95974f48c"
+        },
+        "display": "SINAI-GRACE HOSPITAL"
+      },
+      "code": [ {
+        "coding": [ {
+          "system": "http://nucc.org/provider-taxonomy",
+          "code": "208D00000X",
+          "display": "General Practice"
+        } ],
+        "text": "General Practice"
+      } ],
+      "specialty": [ {
+        "coding": [ {
+          "system": "http://nucc.org/provider-taxonomy",
+          "code": "208D00000X",
+          "display": "General Practice"
+        } ],
+        "text": "General Practice"
+      } ],
+      "location": [ {
+        "identifier": {
+          "system": "https://github.com/synthetichealth/synthea",
+          "value": "7b0ecb8c-2753-3258-830a-9de70cff89ca"
+        },
+        "display": "SINAI-GRACE HOSPITAL"
+      } ],
+      "telecom": [ {
+        "system": "phone",
+        "value": "3139663300"
+      }, {
+        "extension": [ {
+          "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-direct",
+          "valueBoolean": true
+        } ],
+        "system": "email",
+        "value": "Isaac321.Upton904@example.com",
+        "use": "work"
+      } ]
+    },
+    "request": {
+      "method": "POST",
+      "url": "PractitionerRole"
+    }
+  }, {
+    "fullUrl": "urn:uuid:37e93a08-cd38-3931-94ee-8eb238a0306d",
+    "resource": {
+      "resourceType": "Practitioner",
+      "id": "37e93a08-cd38-3931-94ee-8eb238a0306d",
+      "meta": {
+        "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner" ]
+      },
+      "extension": [ {
+        "url": "http://synthetichealth.github.io/synthea/utilization-encounters-extension",
+        "valueInteger": 75
+      } ],
+      "identifier": [ {
+        "system": "http://hl7.org/fhir/sid/us-npi",
+        "value": "9999999779"
+      } ],
+      "active": true,
+      "name": [ {
+        "family": "Gaylord332",
+        "given": [ "Vernetta697" ],
+        "prefix": [ "Dr." ]
+      } ],
+      "telecom": [ {
+        "extension": [ {
+          "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-direct",
+          "valueBoolean": true
+        } ],
+        "system": "email",
+        "value": "Vernetta697.Gaylord332@example.com",
+        "use": "work"
+      } ],
+      "address": [ {
+        "line": [ "2799 W GRAND BLVD" ],
+        "city": "DETROIT",
+        "state": "MI",
+        "postalCode": "48202",
+        "country": "US"
+      } ],
+      "gender": "female"
+    },
+    "request": {
+      "method": "POST",
+      "url": "Practitioner",
+      "ifNoneExist": "identifier=http://hl7.org/fhir/sid/us-npi|9999999779"
+    }
+  }, {
+    "fullUrl": "urn:uuid:8b0c0529-23eb-4858-c4a5-e16cd6d0b13d",
+    "resource": {
+      "resourceType": "PractitionerRole",
+      "id": "8b0c0529-23eb-4858-c4a5-e16cd6d0b13d",
+      "meta": {
+        "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole" ]
+      },
+      "practitioner": {
+        "identifier": {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "value": "9999999779"
+        },
+        "display": "Dr. Vernetta697 Gaylord332"
+      },
+      "organization": {
+        "identifier": {
+          "system": "https://github.com/synthetichealth/synthea",
+          "value": "e2e3e4ee-d195-389d-b6eb-a466e33bf044"
+        },
+        "display": "HENRY FORD HOSPITAL"
+      },
+      "code": [ {
+        "coding": [ {
+          "system": "http://nucc.org/provider-taxonomy",
+          "code": "208D00000X",
+          "display": "General Practice"
+        } ],
+        "text": "General Practice"
+      } ],
+      "specialty": [ {
+        "coding": [ {
+          "system": "http://nucc.org/provider-taxonomy",
+          "code": "208D00000X",
+          "display": "General Practice"
+        } ],
+        "text": "General Practice"
+      } ],
+      "location": [ {
+        "identifier": {
+          "system": "https://github.com/synthetichealth/synthea",
+          "value": "e8b5c9c9-0df3-319d-920f-ea9b52d02eed"
+        },
+        "display": "HENRY FORD HOSPITAL"
+      } ],
+      "telecom": [ {
+        "system": "phone",
+        "value": "3139162600"
+      }, {
+        "extension": [ {
+          "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-direct",
+          "valueBoolean": true
+        } ],
+        "system": "email",
+        "value": "Vernetta697.Gaylord332@example.com",
+        "use": "work"
+      } ]
+    },
+    "request": {
+      "method": "POST",
+      "url": "PractitionerRole"
+    }
+  }, {
+    "fullUrl": "urn:uuid:81a29658-e81e-3beb-90bd-437040fb12b5",
+    "resource": {
+      "resourceType": "Practitioner",
+      "id": "81a29658-e81e-3beb-90bd-437040fb12b5",
+      "meta": {
+        "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner" ]
+      },
+      "extension": [ {
+        "url": "http://synthetichealth.github.io/synthea/utilization-encounters-extension",
+        "valueInteger": 36
+      } ],
+      "identifier": [ {
+        "system": "http://hl7.org/fhir/sid/us-npi",
+        "value": "9999966929"
+      } ],
+      "active": true,
+      "name": [ {
+        "family": "Bednar518",
+        "given": [ "Burl285" ],
+        "prefix": [ "Dr." ]
+      } ],
+      "telecom": [ {
+        "extension": [ {
+          "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-direct",
+          "valueBoolean": true
+        } ],
+        "system": "email",
+        "value": "Burl285.Bednar518@example.com",
+        "use": "work"
+      } ],
+      "address": [ {
+        "line": [ "5575 CONNER ST" ],
+        "city": "DETROIT",
+        "state": "MI",
+        "postalCode": "48213-6400",
+        "country": "US"
+      } ],
+      "gender": "male"
+    },
+    "request": {
+      "method": "POST",
+      "url": "Practitioner",
+      "ifNoneExist": "identifier=http://hl7.org/fhir/sid/us-npi|9999966929"
+    }
+  }, {
+    "fullUrl": "urn:uuid:a6ff265d-89e4-237a-bd1e-2b6f58f9d24c",
+    "resource": {
+      "resourceType": "PractitionerRole",
+      "id": "a6ff265d-89e4-237a-bd1e-2b6f58f9d24c",
+      "meta": {
+        "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitionerrole" ]
+      },
+      "practitioner": {
+        "identifier": {
+          "system": "http://hl7.org/fhir/sid/us-npi",
+          "value": "9999966929"
+        },
+        "display": "Dr. Burl285 Bednar518"
+      },
+      "organization": {
+        "identifier": {
+          "system": "https://github.com/synthetichealth/synthea",
+          "value": "486eb03f-9419-3a9c-a400-9529bc486f1d"
+        },
+        "display": "JORDAN AND THOMAS PLLC"
+      },
+      "code": [ {
+        "coding": [ {
+          "system": "http://nucc.org/provider-taxonomy",
+          "code": "208D00000X",
+          "display": "General Practice"
+        } ],
+        "text": "General Practice"
+      } ],
+      "specialty": [ {
+        "coding": [ {
+          "system": "http://nucc.org/provider-taxonomy",
+          "code": "208D00000X",
+          "display": "General Practice"
+        } ],
+        "text": "General Practice"
+      } ],
+      "location": [ {
+        "identifier": {
+          "system": "https://github.com/synthetichealth/synthea",
+          "value": "c7f6379d-64d9-3f5f-826b-caa821f7e35b"
+        },
+        "display": "JORDAN AND THOMAS PLLC"
+      } ],
+      "telecom": [ {
+        "system": "phone",
+        "value": "313-579-4555"
+      }, {
+        "extension": [ {
+          "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-direct",
+          "valueBoolean": true
+        } ],
+        "system": "email",
+        "value": "Burl285.Bednar518@example.com",
+        "use": "work"
+      } ]
+    },
+    "request": {
+      "method": "POST",
+      "url": "PractitionerRole"
+    }
+  } ]
+}
