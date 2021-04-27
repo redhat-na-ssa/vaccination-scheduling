@@ -144,6 +144,10 @@ $ psql -h 127.0.0.1 -U vaccine -d vaccine -a -f src/main/resources/db/V1_appoint
 [source, shell]
 ----
 $ mvn quarkus:dev -Dquarkus.http.host=192.168.122.1
+
+or
+
+$  mvn clean package -DskipTests && java -jar target/vaccination-scheduler-1.0.0-runner.jar
 ----
 
 . Visit http://localhost:8080 in your browser.
