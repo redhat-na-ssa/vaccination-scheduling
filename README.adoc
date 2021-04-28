@@ -223,7 +223,7 @@ $ tenant_admin_hostname=vplanner-admin.apps.rhtnckpmg.rhsledocp.com
 -----
 
 -----
-$ ansible-playbook playbooks/threescale.yml \
+$ ansible-playbook playbooks/install.yml \
       -e threescale_portal_accesstoken=$tenant_admin_accesstoken \
       -e threescale_portal_hostname=$tenant_admin_hostname
 -----
@@ -283,25 +283,64 @@ When deploying the vaccination scheduling demo to openshift via ansible, the lin
 
 == 3scale Tenant Admin Settings
 
+. Backends
+.. fhir-server-backend
++
+-----
+/fhir => http://fhir-server:8080/fhir
+-----
+
+.. v-scheduler-backend
++
+-----
+/v-scheduler => http://v-scheduler:8080
+-----
+
+. Product
+.. fhir-v-scheduler-product
+
+. App Plans
+.. fhir-v-scheduler-app-plan
+
+. Integration -> Settings -> Deployment
+.. APIcast self-managed
+.. modify staging and prod public base URLs
+. Integration -> Settings -> Authentication -> Credentials Location
++
+Switch to _As HTTP Headers_.  Otherwise, fhir-server will throw the following exception:
++
+-----
+Failure during REST processing: ca.uhn.fhir.rest.server.exceptions.InvalidRequestException: Unknown search parameter "user_key" for resource type "Observation". Valid search parameters for this search are: [_id, _language, _lastUpdated, based-on, category, code, code-value-concept, code-value-date, code-value-quantity, code-value-string, combo-code, combo-code-value-concept, combo-code-value-quantity, combo-data-absent-reason, combo-value-concept, combo-value-quantity, component-code, component-code-value-concept, component-code-value-quantity, component-data-absent-reason, component-value-concept, component-value-quantity, data-absent-reason, date, derived-from, device, encounter, focus, has-member, identifier, method, part-of, patient, performer, specimen, status, subject, value-concept, value-date, value-quantity, value-string]
+-----
+
 . Service Plans
 +
 A service plan is set up to autocreate an application once an account has been approved: 
-+
-image::doc/default_service_plan.png[]
 
-. API backends
+.. Enable Service Plans
 +
-image::doc/api_backends.png[]
+Audience -> Accounts -> Settings -> Usage Rules -> Check: _Service Plans_
 
-. API Deployment Settings
+.. Set up default service plan
 +
-image::doc/api_deployment_settings.png[]
+Product -> Settings -> Usage Rules -> Default Service Plan -> Default Plan -> Default
+
+. App Plans
++
+Enable ability to allow "Developers can select a plan when creating a new application"
++
+Product -> Settings -> Usage Rules -> Application Plans -> Check "Developers can select a plan when creating a new application"
 
 . Mapping Rules
 +
 image::doc/mapping_rules.png[]
 
-. Dev Portal Feature Visibility
+. Developer Portal
+.. Domains & Access
++
+Remove _Developer Portal Access Code_
+
+.. Feature Visibility
 +
 image::doc/dev_portal_feature_vis.png[]
 

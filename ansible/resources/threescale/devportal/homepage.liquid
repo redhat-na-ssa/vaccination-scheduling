@@ -1,0 +1,19 @@
+<header class="jumbotron page-header">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>Vaccination Scheduling</h1>
+      </div>
+    </div>
+  </div>
+</header>
+
+{% if current_user %}
+
+ {% include 'authenticated_homepage_partial' %}
+
+{% else %}
+
+  {% include 'unauthenticated_noplan_signup_form' %}
+
+{% endif %}
