@@ -56,7 +56,7 @@ public interface FhirServerClient {
 
 
 
-    /**********      Workflow      ***************/
+    /**********      Workflow & Management      ***************/
     @GET
     @Path("/Appointment")
     @Produces("application/fhir+json")
@@ -76,6 +76,16 @@ public interface FhirServerClient {
     @Path("/Schedule")
     @Consumes("application/fhir+json")
     Response postSchedule( String scheduleJson);
+
+    @GET
+    @Path("/Encounter")
+    @Produces("application/fhir+json")
+    Response getEncounters();
+
+    @POST
+    @Path("/Encounter")
+    @Consumes("application/fhir+json")
+    Response postEncounter( String encounterJson);
 
 
 

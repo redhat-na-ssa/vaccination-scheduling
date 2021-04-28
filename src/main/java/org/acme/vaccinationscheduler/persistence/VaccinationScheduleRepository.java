@@ -16,14 +16,11 @@
 
 package org.acme.vaccinationscheduler.persistence;
 
-import java.util.List;
-import java.util.Optional;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.acme.vaccinationscheduler.domain.Injection;
 import org.acme.vaccinationscheduler.domain.VaccinationSchedule;
 import org.acme.vaccinationscheduler.mapping.AppointmentMapper;
 import org.acme.vaccinationscheduler.service.AppointmentService;
@@ -49,18 +46,17 @@ public class VaccinationScheduleRepository {
     }
     
     public void persist(VaccinationSchedule vaccinationSchedule) {
+        /*
     	if(this.vaccinationSchedule!=null && !this.vaccinationSchedule.getInjectionList().isEmpty()) {
   		  List<Injection> injections = vaccinationSchedule.getInjectionList();
   		  LOG.info("Persisting injection list of size: "+injections.size());
   		  for(Injection i : injections) { 
   			  if(i!=null && i.getPerson()!=null && i.getId()!=null) {
   				  LOG.trace("Persisting appointment for injection with id: "+i.getId());
-  				  //TODO: how to make sure statuses aren't lost, and remain with the appropriate appt
-  				  //apptService.saveOrUpdateNonNull(apptMapper.fromInjection(i));
   				  apptService.saveOrUpdate(apptMapper.fromInjection(i));
   			  }
   		  }
-    	}
+    	} */
     }
     
     public void handleException(Long l, Throwable t) {

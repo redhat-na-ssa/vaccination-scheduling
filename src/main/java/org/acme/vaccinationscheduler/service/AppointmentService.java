@@ -9,7 +9,7 @@ import javax.transaction.Transactional;
 
 import org.acme.vaccinationscheduler.mapping.AppointmentMapper;
 import org.acme.vaccinationscheduler.persistence.AppointmentRepository;
-import org.acme.vaccinationscheduler.domain.Appointment;
+import org.acme.vaccinationscheduler.domain.PlanningAppointment;
 import org.acme.vaccinationscheduler.entity.AppointmentEntity;
 import org.acme.vaccinationscheduler.exception.ServiceException;
 
@@ -24,37 +24,17 @@ public class AppointmentService {
 		this.apptMapper = apptMapper;
 	}
 	
-	public List<Appointment> findAll() {
-		return apptRepository.findAll().stream()
-				.map(apptMapper::toDomain)
-				.collect(Collectors.toList());
-	}
-	
-	public Optional<Appointment> findById(Long appointmentId) {
-		return apptRepository.findByIdOptional(appointmentId).map(apptMapper::toDomain);
-	}
-	
-	public List<Appointment> findByVaccinationCenter(String vaccinationCenter) {
-		return apptRepository.findByVaccinationCenter(vaccinationCenter)
-				.stream().map(apptMapper::toDomain)
-				.collect(Collectors.toList());
-	}
-	
-	public List<Appointment> findByPersonId(Long personId) {
-		return apptRepository.findByPersonId(personId)
-				.stream().map(apptMapper::toDomain)
-				.collect(Collectors.toList());
-	}
-	
 	@Transactional
-	public Appointment save(Appointment appointment) {
-		AppointmentEntity entity = apptMapper.toEntity(appointment);
+	public PlanningAppointment save(PlanningAppointment appointment) {
+		/*AppointmentEntity entity = apptMapper.toEntity(appointment);
 		apptRepository.persist(entity);
-		return apptMapper.toDomain(entity);
+		return apptMapper.toDomain(entity);*/
+		return null;
 	}
 	
 	@Transactional
-	public Appointment update(Appointment appointment) {
+	public PlanningAppointment update(PlanningAppointment appointment) {
+		/*
 		if (appointment.getAppointmentId() == null) {
 			throw new ServiceException("Appointment does not have an appointmentId");
 		}
@@ -72,11 +52,13 @@ public class AppointmentService {
 		entity.setVaccinationCenterName(appointment.getVaccinationCenterName());
 		entity.setVaccineType(appointment.getVaccineType()==null?null:appointment.getVaccineType().toString());
 		apptRepository.persist(entity);
-		return apptMapper.toDomain(entity);
+		return apptMapper.toDomain(entity);*/
+		return null;
 	}
 	
 	@Transactional
-	public Appointment updateNonNull(Appointment appointment) {
+	public PlanningAppointment updateNonNull(PlanningAppointment appointment) {
+		/*
 		if (appointment.getAppointmentId() == null) {
 			throw new ServiceException("Appointment does not have an appointmentId");
 		}
@@ -102,11 +84,12 @@ public class AppointmentService {
 		if(appointment.getVaccineType()!=null)
 			entity.setVaccineType(appointment.getVaccineType().toString());
 		apptRepository.persist(entity);
-		return apptMapper.toDomain(entity);
+		return apptMapper.toDomain(entity); */
+		return null;
 	}
 	
 	@Transactional
-	public Appointment saveOrUpdate(Appointment appointment) {
+	public PlanningAppointment saveOrUpdate(PlanningAppointment appointment) {
 		if (appointment.getAppointmentId() == null) {
 			throw new ServiceException("Appointment does not have an appointmentId");
 		}
@@ -119,7 +102,7 @@ public class AppointmentService {
 	}
 
 	@Transactional
-	public Appointment saveOrUpdateNonNull(Appointment appointment) {
+	public PlanningAppointment saveOrUpdateNonNull(PlanningAppointment appointment) {
 		if (appointment.getAppointmentId() == null) {
 			throw new ServiceException("Appointment does not have an appointmentId");
 		}

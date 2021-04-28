@@ -1,5 +1,7 @@
 package org.acme.vaccinationscheduler.fhir;
 
+import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.junit.QuarkusTest;
@@ -7,24 +9,21 @@ import io.quarkus.test.junit.QuarkusTest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.google.inject.Inject;
+import org.jboss.logging.Logger;
+import org.apache.commons.io.IOUtils;
 
 import org.acme.vaccinationscheduler.rest.FhirServerClient;
 import org.acme.vaccinationscheduler.util.FhirUtil;
-import org.apache.commons.io.IOUtils;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.jboss.logging.Logger;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
@@ -50,6 +49,7 @@ public class FhirServerTest {
     @RestClient
     FhirServerClient fhirClient;
 
+    @Disabled
     @Test
     public void observationTest() throws IOException {
 
@@ -103,6 +103,7 @@ public class FhirServerTest {
         response.close();
     }
 
+    @Disabled
     @Test
     public void hospitalTest() throws IOException, InterruptedException {
 

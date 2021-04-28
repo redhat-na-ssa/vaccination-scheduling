@@ -60,6 +60,7 @@ class VaccinationScheduleConstraintProviderTest {
                 .penalizesBy(1);
     }
 
+    @Ignore
     @Test
     void ageLimitAstrazeneca() {
         constraintVerifier.verifyThat(VaccinationScheduleConstraintProvider::ageLimitAstrazeneca)

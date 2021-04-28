@@ -12,192 +12,149 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.acme.vaccinationscheduler.domain.Appointment;
-import org.acme.vaccinationscheduler.domain.AppointmentProviderStatus;
-import org.acme.vaccinationscheduler.domain.AppointmentRecipientStatus;
-import org.acme.vaccinationscheduler.service.AppointmentService;
+import org.hl7.fhir.r4.model.Appointment;
 import org.jboss.logging.Logger;
+
+import org.acme.vaccinationscheduler.domain.PlanningAppointment;
+import org.acme.vaccinationscheduler.service.AppointmentService;
 
 @Path("/appointment")
 public class AppointmentResource {
-	
-	@Inject
-	AppointmentService apptService;
-	
-	private static final Logger LOG = Logger.getLogger(AppointmentResource.class);
-	
-	@GET
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Path("/getByAppointmentId/{appointmentId}")
-	public Response getByAppointmentId(@PathParam("appointmentId") Long appointmentId ) {
-		Optional<Appointment> appt = apptService.findById(appointmentId);
-		if(appt.isEmpty()) {
-			LOG.debug("No appointment found with id "+appointmentId);
-			return Response.status(404).build();
-		}
-		return Response.ok(appt).build();
-	}
-	
-	@GET
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Path("/getByVaccinationCenter/{vaccinationCenter}") 
-	public Response findByVaccinationCenter(@PathParam("vaccinationCenter") String vaccinationCenter) { 
-		List<Appointment> appts = apptService.findByVaccinationCenter(vaccinationCenter); 
-		if(appts.isEmpty()) {
-			LOG.debug("No appointments found for vaccination center "+vaccinationCenter);
-			return Response.status(404).build();
-		}
-		LOG.debug("Returning list of "+appts.size()+" appointments at vaccination center "+vaccinationCenter);
-		return Response.ok(appts).build(); 
-	}
-	
-	@GET
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Path("/getByPersonId/{personId}") 
-	public Response getByPersonId (@PathParam("personId") Long personId ) {
-		List<Appointment> appts = apptService.findByPersonId(personId); 
-		if(appts.isEmpty()) {
-			LOG.debug("No appointments found for person with id "+personId);
-			return Response.status(404).build();
-		}
-		LOG.debug("Returning list of "+appts.size()+" appointments for person with id "+personId);
-		return Response.ok(appts).build(); 
-	}
-	 
+    
+    @Inject
+    AppointmentService apptService;
+    
+    private static final Logger LOG = Logger.getLogger(AppointmentResource.class);
+    
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/provider/promote/confirmed")
-    public Response promoteToConfirmed(Appointment appointment){
-		Appointment appt = new Appointment();
-		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentProviderStatus(AppointmentProviderStatus.CONFIRMED);
-		apptService.updateNonNull(appt);
-    	
+    public Response promoteToConfirmed(PlanningAppointment appointment){
+        PlanningAppointment appt = new PlanningAppointment();
+        appt.setAppointmentId(appointment.getAppointmentId());
+        appt.setAppointmentProviderStatus(Appointment.AppointmentStatus.BOOKED.toCode() );
+        apptService.updateNonNull(appt);
+        
         return Response.ok().build();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/provider/cancelled/supply")
-    public Response appointmentCancelledNoSupply(Appointment appointment){
-		Appointment appt = new Appointment();
-		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentProviderStatus(AppointmentProviderStatus.CANCELLED_PROVIDER_SUPPLY );
-		apptService.updateNonNull(appt);
-    	
+    public Response appointmentCancelledNoSupply(PlanningAppointment appointment){
+        PlanningAppointment appt = new PlanningAppointment();
+        appt.setAppointmentId(appointment.getAppointmentId());
+        appt.setAppointmentProviderStatus(Appointment.AppointmentStatus.CANCELLED.toCode() );
+        apptService.updateNonNull(appt);
+        
         return Response.ok().build();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/provider/cancelled/noshow")
-    public Response appointmentCanceledNoShow(Appointment appointment){
-		Appointment appt = new Appointment();
-		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentProviderStatus(AppointmentProviderStatus.CANCELLED_NO_SHOW );
-		apptService.updateNonNull(appt);
-    	
+    public Response appointmentCanceledNoShow(PlanningAppointment appointment){
+        PlanningAppointment appt = new PlanningAppointment();
+        appt.setAppointmentId(appointment.getAppointmentId());
+        appt.setAppointmentProviderStatus(Appointment.AppointmentStatus.NOSHOW.toCode() );
+        apptService.updateNonNull(appt);
+        
         return Response.ok().build();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/provider/vaccine/administered")
-    public Response vaccineAdministered(Appointment appointment){
-		Appointment appt = new Appointment();
-		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentProviderStatus(AppointmentProviderStatus.COMPLETED );
-		apptService.updateNonNull(appt);
-    	
+    public Response vaccineAdministered(PlanningAppointment appointment){
+        PlanningAppointment appt = new PlanningAppointment();
+        appt.setAppointmentId(appointment.getAppointmentId());
+        appt.setAppointmentProviderStatus(Appointment.AppointmentStatus.FULFILLED.toCode() );
+        apptService.updateNonNull(appt);
+        
         return Response.ok().build();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/provider/vaccine/notadministered/")
-    public Response vaccineNotAdministered(Appointment appointment){
-		Appointment appt = new Appointment();
-		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentProviderStatus(AppointmentProviderStatus.NOT_ADMINISTERED );
-		apptService.updateNonNull(appt);
-    	
+    public Response vaccineNotAdministered(PlanningAppointment appointment){
+        PlanningAppointment appt = new PlanningAppointment();
+        appt.setAppointmentId(appointment.getAppointmentId());
+        appt.setAppointmentProviderStatus(Appointment.AppointmentStatus.PENDING.toCode() );
+        apptService.updateNonNull(appt);
+        
         return Response.ok().build();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/provider/vaccine/standby/")
-    public Response vaccineStandby(Appointment appointment){
-		Appointment appt = new Appointment();
-		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentProviderStatus(AppointmentProviderStatus.STANDBY );
-		apptService.updateNonNull(appt);
-    	
+    public Response vaccineStandby(PlanningAppointment appointment){
+        PlanningAppointment appt = new PlanningAppointment();
+        appt.setAppointmentId(appointment.getAppointmentId());
+        appt.setAppointmentProviderStatus(Appointment.AppointmentStatus.PENDING.toCode() );
+        apptService.updateNonNull(appt);
+        
         return Response.ok().build();
     }
-
-
-
-
-
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/recipient/accepted")
-    public Response appointmentAcceptedByRecipient(Appointment appointment){
-		Appointment appt = new Appointment();
-		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentRecipientStatus(AppointmentRecipientStatus.CONFIRMED );
-		apptService.updateNonNull(appt);
-    	
+    public Response appointmentAcceptedByRecipient(PlanningAppointment appointment){
+        PlanningAppointment appt = new PlanningAppointment();
+        appt.setAppointmentId(appointment.getAppointmentId());
+        appt.setAppointmentRecipientStatus(Appointment.AppointmentStatus.CHECKEDIN.toCode());
+        apptService.updateNonNull(appt);
+        
         return Response.ok().build();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/recipient/vaccine/administered")
-    public Response recipientVaccineAdministered(Appointment appointment){
-		Appointment appt = new Appointment();
-		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentRecipientStatus(AppointmentRecipientStatus.ADMINISTERED );
-		apptService.updateNonNull(appt);
-    	
+    public Response recipientVaccineAdministered(PlanningAppointment appointment){
+        PlanningAppointment appt = new PlanningAppointment();
+        appt.setAppointmentId(appointment.getAppointmentId());
+        appt.setAppointmentRecipientStatus(Appointment.AppointmentStatus.FULFILLED.toCode());
+        apptService.updateNonNull(appt);
+        
         return Response.ok().build();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/recipient/vaccine/notadministered/")
-    public Response recipientVaccineNotAdministered(Appointment appointment){
-		Appointment appt = new Appointment();
-		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentRecipientStatus(AppointmentRecipientStatus.NOT_ADMINISTERED );
-		apptService.updateNonNull(appt);
-    	
+    public Response recipientVaccineNotAdministered(PlanningAppointment appointment){
+        PlanningAppointment appt = new PlanningAppointment();
+        appt.setAppointmentId(appointment.getAppointmentId());
+        appt.setAppointmentRecipientStatus(Appointment.AppointmentStatus.PENDING.toCode() );
+        apptService.updateNonNull(appt);
+        
         return Response.ok().build();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/recipient/declined")
-    public Response appointmentDeclinedByRecipient(Appointment appointment){
-		Appointment appt = new Appointment();
-		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentRecipientStatus(AppointmentRecipientStatus.DECLINED );
-		apptService.updateNonNull(appt);
-    	
+    public Response appointmentDeclinedByRecipient(PlanningAppointment appointment){
+        PlanningAppointment appt = new PlanningAppointment();
+        appt.setAppointmentId(appointment.getAppointmentId());
+        appt.setAppointmentRecipientStatus(Appointment.AppointmentStatus.CANCELLED.toCode() );
+        apptService.updateNonNull(appt);
+        
         return Response.ok().build();
     }
 
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/recipient/cancelled")
-    public Response appointmentCancelledByRecipient(Appointment appointment){
-		Appointment appt = new Appointment();
-		appt.setAppointmentId(appointment.getAppointmentId());
-		appt.setAppointmentRecipientStatus(AppointmentRecipientStatus.CANCELLED );
-		apptService.updateNonNull(appt);
-    	
+    public Response appointmentCancelledByRecipient(PlanningAppointment appointment){
+        PlanningAppointment appt = new PlanningAppointment();
+        appt.setAppointmentId(appointment.getAppointmentId());
+        appt.setAppointmentRecipientStatus(Appointment.AppointmentStatus.CANCELLED.toCode() );
+        apptService.updateNonNull(appt);
+        
         return Response.ok().build();
     }
     
