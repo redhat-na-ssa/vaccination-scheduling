@@ -184,7 +184,7 @@ This JSON representation can be retrieved as follows:
 +
 -----
 $ mvn clean package -DskipTests
-$ podman build -f docker/Dockerfile -t quay.io/redhat_naps_da/vaccination_scheduling:jbride-363f9f4-3 . 
+$ podman build -f docker/Dockerfile -t quay.io/redhat_naps_da/vaccination_scheduling:jbride-d506216dd-1 . 
 -----
 
 . push image
@@ -204,16 +204,15 @@ $ oc import-image v-scheduler --all=true --from=quay.io/redhat_naps_da/vaccinati
 Deployment to OCP is done in an automated, repeatable manner using ansible.
 The ansible is included in this project and deploys the following:
 
-* 3scale tenant
 * 3scale apicast gateways 
 * vaccination scheduling quarkus app and database
 
-. This section assumes that a 3scale tenant has already been created
+. This ansible assumes that a 3scale tenant has already been manually created via the 3scale master
 
 . Set an environment variable that captures the tenant admin access token:
 +
 -----
-# Acquired as per the following in 3scale tenant:  `Gear Icon -> Personal Settings -> Tokens -> Access Tokens -> Add Access Token`
+# Acquired as per the following in 3scale tenant:  `Gear Icon -> Personal -> Tokens -> Access Tokens -> Add Access Token`
 $ tenant_admin_accesstoken=c06015d7fba524064feaf5ae6b24e1a8
 -----
 

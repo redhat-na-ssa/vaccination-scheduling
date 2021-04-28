@@ -1,5 +1,5 @@
 psql_app_name: psql-fhir
-application_name: fhir-server
+application_name: "{{ fhir_server_application_name }}"
 
 postgresql_pv_capacity: 5Gi 
 postgresql_version: 12-el8

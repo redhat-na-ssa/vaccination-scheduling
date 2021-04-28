@@ -10,8 +10,10 @@ openshift_cli: oc
 
 project_admin: user1
 
-project_name: "v-scheduling-{{ project_admin }}"
+project_name: "v-planner-{{ project_admin }}"
 
 deploy_from: image
+
+fhir_server_application_name: fhir-server
 
 

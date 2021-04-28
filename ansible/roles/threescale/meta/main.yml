@@ -1,7 +1,6 @@
 ---
 
 dependencies:
-  - role: openshift_domain
   - role: work_dir
   - role: openshift_project
     when: >
@@ -9,3 +8,4 @@ dependencies:
       ACTION is none or
       ACTION|trim() == "" or
       ACTION|trim() == "install"
+  - role: openshift_domain
