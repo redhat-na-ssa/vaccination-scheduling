@@ -16,15 +16,15 @@
 
 package com.redhat.naps.vaccinationscheduler.domain;
 
-public class VaccinationCenter {
+public class PlanningVaccinationCenter {
 
     private String name;
     private PlanningLocation location;
     private int lineCount;
     
-    public VaccinationCenter() {}
+    public PlanningVaccinationCenter() {}
 
-    public VaccinationCenter(String name, PlanningLocation location, int lineCount) {
+    public PlanningVaccinationCenter(String name, PlanningLocation location, int lineCount) {
         this.name = name;
         this.location = location;
         this.lineCount = lineCount;

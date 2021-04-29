@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import com.redhat.naps.vaccinationscheduler.domain.Injection;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
-import com.redhat.naps.vaccinationscheduler.domain.VaccinationCenter;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.domain.VaccinationSchedule;
 import com.redhat.naps.vaccinationscheduler.domain.VaccineType;
 import org.junit.Ignore;
@@ -31,7 +31,7 @@ import org.optaplanner.test.api.score.stream.ConstraintVerifier;
 
 class VaccinationScheduleConstraintProviderTest {
 
-    private static final VaccinationCenter VACCINATION_CENTER_1 = new VaccinationCenter("Alpha", new PlanningLocation(0, 0), 3);
+    private static final PlanningVaccinationCenter VACCINATION_CENTER_1 = new PlanningVaccinationCenter("Alpha", new PlanningLocation(0, 0), 3);
     private static final LocalDate MONDAY = LocalDate.of(2021, 2, 1);
     private static final LocalDate TUESDAY = LocalDate.of(2021, 2, 2);
     private static final LocalDate WEDNESDAY = LocalDate.of(2021, 2, 3);

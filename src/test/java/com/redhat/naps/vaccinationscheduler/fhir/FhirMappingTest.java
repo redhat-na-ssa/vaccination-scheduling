@@ -16,27 +16,27 @@ import org.jboss.logging.Logger;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import io.quarkus.test.junit.QuarkusTest;
+import org.apache.commons.io.IOUtils;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import ca.uhn.fhir.context.FhirContext;
+import org.hl7.fhir.exceptions.FHIRFormatError;
+import org.hl7.fhir.r4.model.Appointment;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 
 import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningAppointment;
 import com.redhat.naps.vaccinationscheduler.domain.VaccineType;
 import com.redhat.naps.vaccinationscheduler.mapping.FhirMapper;
 import com.redhat.naps.vaccinationscheduler.rest.FhirServerClient;
 import com.redhat.naps.vaccinationscheduler.util.FhirUtil;
-
-import org.apache.commons.io.IOUtils;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.hl7.fhir.exceptions.FHIRFormatError;
-import org.hl7.fhir.r4.model.Appointment;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.HumanName;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 
 @QuarkusTest
 public class FhirMappingTest {
@@ -55,10 +55,43 @@ public class FhirMappingTest {
     @RestClient
     FhirServerClient fhirClient;
 
-    //@Disabled
+    @Disabled
     @Test
-    public void mapFhirToPlanningPatientTest() throws IOException {
-        log.info("mapFhirToPlanningPatient() ... ");
+    public void mapFhirOrganizationToPlanningVaccinationCenterTest() throws IOException {
+
+        // GET
+        Response gResponse = null;
+        try {
+            gResponse = fhirClient.getOrganizations();
+            assertTrue(gResponse.getStatus() == 200 || gResponse.getStatus() == 201);
+            String orgJson = IOUtils.toString((InputStream)gResponse.getEntity(), "UTF-8");
+            Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, orgJson);
+            List<BundleEntryComponent> becs = bObj.getEntry();
+            log.info("mapFhirOrganizationToPlanningVaccinationCenterTest() # of Organizations = "+becs.size());
+            assertTrue(becs.size() > 0);
+
+            for(BundleEntryComponent bec : becs){
+                Organization pObj = (Organization)bec.getResource();
+                try {
+                    PlanningVaccinationCenter pvc = fhirMapper.fromFhirOrganizationToPlanningVaccinationCenter(pObj);
+                    assertTrue(pObj.getName().equals(pvc.getName()));
+
+                }catch(Throwable x){
+                    x.printStackTrace();
+                }
+            }
+
+        }catch(WebApplicationException x) {
+            gResponse = x.getResponse();
+            log.error("mapFhirOrganizationToPlanningVaccinationCenterTest() error status = "+gResponse.getStatus()+"  when getting patients from FhirServer");
+            log.error("mapFhirOrganizationToPlanningVaccinationCenterTest() error meesage = "+IOUtils.toString((InputStream)gResponse.getEntity(), "UTF-8"));
+        }
+        gResponse.close();
+    }
+
+    @Disabled
+    @Test
+    public void mapFhirPatientToPlanningPatientTest() throws IOException {
 
         // GET
         Response gResponse = null;
@@ -68,7 +101,7 @@ public class FhirMappingTest {
             String orgJson = IOUtils.toString((InputStream)gResponse.getEntity(), "UTF-8");
             Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, orgJson);
             List<BundleEntryComponent> becs = bObj.getEntry();
-            log.info("mapFhirToPlanningPatientTest() # of Patients = "+becs.size());
+            log.info("mapFhirPatientToPlanningPatientTest() # of Patients = "+becs.size());
             assertTrue(becs.size() > 0);
 
             for(BundleEntryComponent bec : becs){
@@ -84,19 +117,19 @@ public class FhirMappingTest {
 
         }catch(WebApplicationException x) {
             gResponse = x.getResponse();
-            log.error("mapFhirToPlanningPatientTest() error status = "+gResponse.getStatus()+"  when getting patients from FhirServer");
-            log.error("mapFhirToPlanningPatientTest() error meesage = "+IOUtils.toString((InputStream)gResponse.getEntity(), "UTF-8"));
+            log.error("mapFhirPatientToPlanningPatientTest() error status = "+gResponse.getStatus()+"  when getting patients from FhirServer");
+            log.error("mapFhirPatientToPlanningPatientTest() error meesage = "+IOUtils.toString((InputStream)gResponse.getEntity(), "UTF-8"));
         }
         gResponse.close();
-
-        
     }
 
+    /*  Vaccination Schedule planner will generate PlanningAppointments.
+        These Planning Appointments will need to be mapped to FHIR Appointments and pushed to the FHIR server
+    */
     @Disabled
     @Test
-    public void mapPlanningToFhirAppointmentTest() throws FHIRFormatError, IOException {
+    public void mapPlanningAppointmentToFhirAppointmentTest() throws FHIRFormatError, IOException {
         String patientId = "210";
-        String patientIdString = "Patient/"+patientId;
         String patientName = "RHT Shadowman";
         PlanningAppointment oAppointment = createSamplePlanningAppointment(patientId, patientName);
         
@@ -104,7 +137,7 @@ public class FhirMappingTest {
             Appointment appObj = fhirMapper.fromPlanningAppointment(oAppointment);
             String appJson = fhirCtx.newJsonParser().encodeResourceToString(appObj);
     
-            log.info("mapPlanningToFhirAppointmentTest() appJSON = \n\n"+appJson+"\n");
+            log.info("mapPlanningAppointmentToFhirAppointmentTest() appJSON = \n\n"+appJson+"\n");
 
             if(interactWithFhirServer){
 
@@ -114,14 +147,14 @@ public class FhirMappingTest {
                     Patient patientObj = createSampleFhirPatient(patientId, patientName);
                     String patientJson = fhirCtx.newJsonParser().encodeResourceToString(patientObj);
                     response = fhirClient.postPatient(patientJson);
-                    log.info("mapPlanningToFhirAppointmentTest() patient POST response status = "+response.getStatus());
+                    log.info("mapPlanningAppointmentToFhirAppointmentTest() patient POST response status = "+response.getStatus());
 
                     // 2)  Now that patient exists in FHIR server, post corresponding appointment
                     response = fhirClient.postAppointment(appJson);
-                    log.info("appointmentMappingTest() appointment POST response status = "+response.getStatus());
+                    log.info("mapPlanningAppointmentToFhirAppointmentTest() appointment POST response status = "+response.getStatus());
                 }catch(WebApplicationException x){
                     response = x.getResponse();
-                    log.info("mapPlanningToFhirAppointmentTest() response exception = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
+                    log.info("mapPlanningAppointmentToFhirAppointmentTest() response exception = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
                 }
             }
 

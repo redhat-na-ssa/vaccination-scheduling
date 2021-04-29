@@ -346,12 +346,12 @@ image::doc/dev_portal_feature_vis.png[]
 
 == FHIR based Vaccine Schedule Optimization
 
-. Person              -> https://www.hl7.org/fhir/patient.html
-. VaccinationCenter   -> https://www.hl7.org/fhir/location.html
-. Appointment         -> https://www.hl7.org/fhir/appointment.html
-. AppointmentStatus   -> https://www.hl7.org/fhir/valueset-appointmentstatus.html
-. VaccinationStatus   -> https://www.hl7.org/fhir/valueset-immunization-status.html
-. Injection           -> https://www.hl7.org/fhir/immunization.html
+. PlanningPerson                -> https://www.hl7.org/fhir/patient.html
+. PlanningAppointment           -> https://www.hl7.org/fhir/appointment.html
+. PlanningVaccinationCenter     -> https://www.hl7.org/fhir/organization.html
+. AppointmentStatus             -> https://www.hl7.org/fhir/valueset-appointmentstatus.html
+. VaccinationStatus             -> https://www.hl7.org/fhir/valueset-immunization-status.html
+. Injection                     -> https://www.hl7.org/fhir/immunization.html
 
 === FHIR Server Image for OCP
 

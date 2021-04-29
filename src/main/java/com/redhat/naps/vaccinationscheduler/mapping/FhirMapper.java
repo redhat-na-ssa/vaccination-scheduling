@@ -1,5 +1,6 @@
 package com.redhat.naps.vaccinationscheduler.mapping;
 
+import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ import org.hl7.fhir.r4.model.EnumFactory;
 import org.hl7.fhir.r4.model.Enumeration;
 import org.hl7.fhir.r4.model.HealthcareService;
 import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Address;
@@ -34,6 +36,7 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningAppointment;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.util.FhirUtil;
 
 @ApplicationScoped
@@ -58,6 +61,25 @@ public class FhirMapper {
     @ConfigProperty(name = FhirUtil.TIMESLOTDURATION_MINUTES, defaultValue = "30")
     int timeSlotDurationMinutes;
 
+    public PlanningVaccinationCenter fromFhirOrganizationToPlanningVaccinationCenter(Organization pObj) {
+        String name = pObj.getName();
+
+        PlanningLocation pLocation;
+        List<Address> addresses = pObj.getAddress();
+        if(addresses.size() > 0){
+            //TO-DO : Determine lat / long from Patient's Address
+            Address addressObj = pObj.getAddress().get(0);
+            pLocation = new PlanningLocation(90.00, 135.00);
+        }else{
+            log.warnv("{0}  fromFhirOrganizationToPlanningVaccinationCenter() No address from organization. Will set to North Pole", name);
+            pLocation = new PlanningLocation(90.00, 135.00);
+        }
+        
+        //TO-DO:  Investigate purpose of PlanningVaccinationCenter.lineCount
+        PlanningVaccinationCenter pvc = new PlanningVaccinationCenter(name, pLocation, 1);
+        return pvc;
+    }
+
 
     public PlanningPerson fromFhirPatientToPlanningPerson(Patient pObj) {
         HumanName name = pObj.getName().get(0);
@@ -71,7 +93,7 @@ public class FhirMapper {
         LocalDate lBirthDate = convertToLocalDate(birthDate);
         Period period = Period.between(lBirthDate, LocalDate.now());
 
-        PlanningLocation pLocation = new PlanningLocation();
+        PlanningLocation pLocation;
         List<Address> addresses = pObj.getAddress();
         if(addresses.size() > 0){
             //TO-DO : Determine lat / long from Patient's Address
@@ -160,4 +182,6 @@ public class FhirMapper {
         .atZone(ZoneId.systemDefault())
         .toLocalDate();
     }
+
+
 }

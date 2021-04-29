@@ -33,7 +33,7 @@ public class VaccinationSchedule {
     private List<VaccineType> vaccineTypeList;
 
     @ProblemFactCollectionProperty
-    private List<VaccinationCenter> vaccinationCenterList;
+    private List<PlanningVaccinationCenter> vaccinationCenterList;
 
     private List<LocalDateTime> timeslotDateTimeList;
 
@@ -54,7 +54,7 @@ public class VaccinationSchedule {
     public VaccinationSchedule() {
     }
 
-    public VaccinationSchedule(List<VaccineType> vaccineTypeList, List<VaccinationCenter> vaccinationCenterList, List<LocalDateTime> timeslotDateTimeList, List<PlanningPerson> personList, List<Injection> injectionList) {
+    public VaccinationSchedule(List<VaccineType> vaccineTypeList, List<PlanningVaccinationCenter> vaccinationCenterList, List<LocalDateTime> timeslotDateTimeList, List<PlanningPerson> personList, List<Injection> injectionList) {
         this.vaccineTypeList = vaccineTypeList;
         this.vaccinationCenterList = vaccinationCenterList;
         this.timeslotDateTimeList = timeslotDateTimeList;
@@ -66,7 +66,7 @@ public class VaccinationSchedule {
         return vaccineTypeList;
     }
 
-    public List<VaccinationCenter> getVaccinationCenterList() {
+    public List<PlanningVaccinationCenter> getVaccinationCenterList() {
         return vaccinationCenterList;
     }
 

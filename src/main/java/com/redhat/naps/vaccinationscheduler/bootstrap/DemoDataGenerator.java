@@ -42,7 +42,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import com.redhat.naps.vaccinationscheduler.domain.Injection;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
-import com.redhat.naps.vaccinationscheduler.domain.VaccinationCenter;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.domain.VaccinationSchedule;
 import com.redhat.naps.vaccinationscheduler.domain.VaccineType;
 import com.redhat.naps.vaccinationscheduler.persistence.VaccinationScheduleRepository;
@@ -136,11 +136,11 @@ public class DemoDataGenerator {
 
         Random random = new Random(17);
         List<VaccineType> vaccineTypeList = List.of(VaccineType.values());
-        List<VaccinationCenter> vaccinationCenterList = new ArrayList<>();
-        vaccinationCenterList.add(new VaccinationCenter("Alpha center", pickLocation(random), 3));
-        vaccinationCenterList.add(new VaccinationCenter("Beta center", pickLocation(random), 1));
-        vaccinationCenterList.add(new VaccinationCenter("Gamma center", pickLocation(random), 1));
-        int lineTotal = vaccinationCenterList.stream().mapToInt(VaccinationCenter::getLineCount).sum();
+        List<PlanningVaccinationCenter> vaccinationCenterList = new ArrayList<>();
+        vaccinationCenterList.add(new PlanningVaccinationCenter("Alpha center", pickLocation(random), 3));
+        vaccinationCenterList.add(new PlanningVaccinationCenter("Beta center", pickLocation(random), 1));
+        vaccinationCenterList.add(new PlanningVaccinationCenter("Gamma center", pickLocation(random), 1));
+        int lineTotal = vaccinationCenterList.stream().mapToInt(PlanningVaccinationCenter::getLineCount).sum();
 
         List<LocalDateTime> timeslotDateTimeList = new ArrayList<>(windowDaysLength * injectionsPerLinePerDay);
         for (int dayIndex = 0; dayIndex < windowDaysLength; dayIndex++) {
@@ -176,7 +176,7 @@ public class DemoDataGenerator {
 
         List<Injection> injectionList = new ArrayList<>();
         long injectionId = 0L;
-        for (VaccinationCenter vaccinationCenter : vaccinationCenterList) {
+        for (PlanningVaccinationCenter vaccinationCenter : vaccinationCenterList) {
             for (int dayIndex = 0; dayIndex < windowDaysLength; dayIndex++) {
                 LocalDate date = windowStartDate.plusDays(dayIndex);
                 for (int lineIndex = 0; lineIndex < vaccinationCenter.getLineCount(); lineIndex++) {

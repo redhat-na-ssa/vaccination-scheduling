@@ -29,7 +29,7 @@ public class Injection {
     @PlanningId
     private Long id;
 
-    private VaccinationCenter vaccinationCenter;
+    private PlanningVaccinationCenter vaccinationCenter;
     private int lineIndex;
     private LocalDateTime dateTime;
     private VaccineType vaccineType;
@@ -44,7 +44,7 @@ public class Injection {
     public Injection() {
     }
 
-    public Injection(Long id, VaccinationCenter vaccinationCenter, int lineIndex,
+    public Injection(Long id, PlanningVaccinationCenter vaccinationCenter, int lineIndex,
             LocalDateTime dateTime, VaccineType vaccineType) {
         this.id = id;
         this.vaccinationCenter = vaccinationCenter;
@@ -53,7 +53,7 @@ public class Injection {
         this.vaccineType = vaccineType;
     }
 
-    public Injection(long id, VaccinationCenter vaccinationCenter, int lineIndex, LocalDateTime dateTime, VaccineType vaccineType, PlanningPerson person) {
+    public Injection(long id, PlanningVaccinationCenter vaccinationCenter, int lineIndex, LocalDateTime dateTime, VaccineType vaccineType, PlanningPerson person) {
         this.id = id;
         this.vaccinationCenter = vaccinationCenter;
         this.lineIndex = lineIndex;
@@ -75,7 +75,7 @@ public class Injection {
         return id;
     }
 
-    public VaccinationCenter getVaccinationCenter() {
+    public PlanningVaccinationCenter getVaccinationCenter() {
         return vaccinationCenter;
     }
 
