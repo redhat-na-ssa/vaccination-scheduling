@@ -39,32 +39,26 @@ import com.redhat.naps.vaccinationscheduler.rest.FhirServerClient;
 @ApplicationScoped
 public class FhirDataGenerator {
 
-    private static final String GENERATE_PATIENTS="com.redhat.vaccination.scheduling.generatePatients";
-    private static final String PATIENT_GENERATOR_COUNT="com.redhat.vaccination.scheduling.patientGeneratorCount";
-    private static final String PATIENT_GENERATOR_STATE="com.redhat.vaccination.scheduling.patientGeneratorState";
-    private static final String PATIENT_GENERATOR_CITY="com.redhat.vaccination.scheduling.patientGeneratorCity";
-    private static final String PATIENT_GENERATOR_BASE_DIR="com.redhat.vaccination.scheduling.patientGeneratorBaseDir";
-
     private static FhirContext fhirCtx = FhirContext.forR4();
 
     @Inject
-    @ConfigProperty(name = GENERATE_PATIENTS, defaultValue = "false")
+    @ConfigProperty(name = FhirUtil.GENERATE_PATIENTS, defaultValue = "false")
     boolean generatePatients;
 
     @Inject
-    @ConfigProperty(name = PATIENT_GENERATOR_COUNT, defaultValue = "50")
+    @ConfigProperty(name = FhirUtil.PATIENT_GENERATOR_COUNT, defaultValue = "50")
     int patientGeneratorCount;
 
     @Inject
-    @ConfigProperty(name = PATIENT_GENERATOR_STATE, defaultValue = "Michigan")
+    @ConfigProperty(name = FhirUtil.PATIENT_GENERATOR_STATE, defaultValue = "Michigan")
     String patientGeneratorState;
 
     @Inject
-    @ConfigProperty(name = PATIENT_GENERATOR_CITY, defaultValue = "Detroit")
+    @ConfigProperty(name = FhirUtil.PATIENT_GENERATOR_CITY, defaultValue = "Detroit")
     String patientGeneratorCity;
 
     @Inject
-    @ConfigProperty(name = PATIENT_GENERATOR_BASE_DIR, defaultValue = "/tmp")
+    @ConfigProperty(name = FhirUtil.PATIENT_GENERATOR_BASE_DIR, defaultValue = "/tmp")
     String patientGeneratorBaseDir;
 
     @Inject

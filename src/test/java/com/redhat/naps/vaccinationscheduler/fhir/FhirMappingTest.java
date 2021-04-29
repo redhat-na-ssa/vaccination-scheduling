@@ -30,7 +30,7 @@ public class FhirMappingTest {
         PlanningAppointment oAppointment = createSampleOptaplannerAppointment();
         
         try {
-            Appointment appObj = appointmentMapper.fromAppointment(oAppointment);
+            Appointment appObj = appointmentMapper.fromPlanningAppointment(oAppointment);
             String appJson = fhirCtx.newJsonParser().encodeResourceToString(appObj);
     
             log.info("appointmentMappingTest() appJSON = \n\n"+appJson+"\n");

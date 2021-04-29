@@ -11,7 +11,7 @@ public class PlanningAppointment {
     private LocalDateTime timeslotDateTime;
     private Long personId;
     private String personName;
-    private Boolean isFirstDoseAdministered;
+    private Boolean isFirstDoseAdministered = false;
     private String appointmentProviderStatus;
     private String appointmentRecipientStatus;
     
