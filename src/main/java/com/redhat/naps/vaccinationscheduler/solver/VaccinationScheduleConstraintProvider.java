@@ -19,7 +19,7 @@ package com.redhat.naps.vaccinationscheduler.solver;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 import com.redhat.naps.vaccinationscheduler.domain.Injection;
-import com.redhat.naps.vaccinationscheduler.domain.Person;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
 import com.redhat.naps.vaccinationscheduler.domain.VaccineType;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
 import org.optaplanner.core.api.score.stream.Constraint;
@@ -74,8 +74,8 @@ public class VaccinationScheduleConstraintProvider implements ConstraintProvider
     Constraint secondShotMustBeAssigned(ConstraintFactory constraintFactory) {
         // If a person is coming for their 2nd shot, assign them to a shot, regardless of their age.
         return constraintFactory
-                .from(Person.class)
-                .filter(Person::isFirstShotInjected)
+                .from(PlanningPerson.class)
+                .filter(PlanningPerson::isFirstShotInjected)
                 .ifNotExists(Injection.class, Joiners.equal(person -> person, Injection::getPerson))
                 .penalize("Second shot must be assigned", HardMediumSoftLongScore.ONE_HARD);
     }
@@ -83,9 +83,9 @@ public class VaccinationScheduleConstraintProvider implements ConstraintProvider
     Constraint assignAllOlderPeople(ConstraintFactory constraintFactory) {
         // Schedule all older people for an injection. This is softer than secondShotMustBeAssigned().
         return constraintFactory
-                .from(Person.class)
+                .from(PlanningPerson.class)
                 .ifNotExists(Injection.class, Joiners.equal(person -> person, Injection::getPerson))
-                .penalizeLong("Assign all older people", HardMediumSoftLongScore.ONE_MEDIUM, Person::getAge);
+                .penalizeLong("Assign all older people", HardMediumSoftLongScore.ONE_MEDIUM, PlanningPerson::getAge);
     }
 
     Constraint secondShotIdealDay(ConstraintFactory constraintFactory) {

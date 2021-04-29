@@ -9,7 +9,7 @@ public class PlanningAppointment {
     private VaccineType vaccineType;
     private String vaccinationCenterName;
     private LocalDateTime timeslotDateTime;
-    private Long personId;
+    private String personId;
     private String personName;
     private Boolean isFirstDoseAdministered = false;
     private String appointmentProviderStatus;
@@ -57,10 +57,10 @@ public class PlanningAppointment {
     public void setTimeslotDateTime(LocalDateTime timeslotDateTime) {
         this.timeslotDateTime = timeslotDateTime;
     }
-    public Long getPersonId() {
+    public String getPersonId() {
         return personId;
     }
-    public void setPersonId(Long personId) {
+    public void setPersonId(String personId) {
         this.personId = personId;
     }
     public String getPersonName() {
@@ -69,5 +69,14 @@ public class PlanningAppointment {
     public void setPersonName(String personName) {
         this.personName = personName;
     }
+    @Override
+    public String toString() {
+        return "PlanningAppointment [appointmentId=" + appointmentId + ", appointmentProviderStatus="
+                + appointmentProviderStatus + ", appointmentRecipientStatus=" + appointmentRecipientStatus
+                + ", isFirstDoseAdministered=" + isFirstDoseAdministered + ", personId=" + personId + ", personName="
+                + personName + ", timeslotDateTime=" + timeslotDateTime + ", vaccinationCenterName="
+                + vaccinationCenterName + ", vaccineType=" + vaccineType + "]";
+    }
+
 
 }

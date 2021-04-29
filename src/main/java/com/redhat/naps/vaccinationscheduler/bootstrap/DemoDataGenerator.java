@@ -40,8 +40,8 @@ import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import com.redhat.naps.vaccinationscheduler.domain.Injection;
-import com.redhat.naps.vaccinationscheduler.domain.Location;
-import com.redhat.naps.vaccinationscheduler.domain.Person;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
 import com.redhat.naps.vaccinationscheduler.domain.VaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.domain.VaccinationSchedule;
 import com.redhat.naps.vaccinationscheduler.domain.VaccineType;
@@ -152,13 +152,13 @@ public class DemoDataGenerator {
         }
 
         int personListSize = (lineTotal * injectionsPerLinePerDay * windowDaysLength) * 5 / 4; // 25% too many
-        List<Person> personList = new ArrayList<>(personListSize);
+        List<PlanningPerson> personList = new ArrayList<>(personListSize);
         long personId = 0L;
         for (int i = 0; i < personListSize; i++) {
             int lastNameI = i / PERSON_FIRST_NAMES.length;
             String name = PERSON_FIRST_NAMES[i % PERSON_FIRST_NAMES.length]
                     + " " + (lastNameI < 26 ? ((char) ('A' + lastNameI)) + "." : lastNameI + 1);
-            Location location = pickLocation(random);
+            PlanningLocation location = pickLocation(random);
             LocalDate birthdate = MINIMUM_BIRTH_DATE.plusDays(random.nextInt(BIRTH_DATE_RANGE_LENGTH));
             int age = (int) YEARS.between(birthdate, windowStartDate);
             boolean firstShotInjected = random.nextDouble() < 0.25;
@@ -169,7 +169,7 @@ public class DemoDataGenerator {
             LocalDate secondShotIdealDate = firstShotInjected ?
                     windowStartDate.plusDays(random.nextInt(windowDaysLength))
                     : null;
-            Person person = new Person(personId++, name, location,
+            PlanningPerson person = new PlanningPerson(Long.toString(personId++), name, location,
                     birthdate, age, firstShotInjected, firstShotVaccineType, secondShotIdealDate);
             personList.add(person);
         }
@@ -194,10 +194,10 @@ public class DemoDataGenerator {
         return vSchedule;
     }
 
-    public Location pickLocation(Random random) {
+    public PlanningLocation pickLocation(Random random) {
         double latitude = MINIMUM_LATITUDE + (random.nextDouble() * (MAXIMUM_LATITUDE - MINIMUM_LATITUDE));
         double longitude = MINIMUM_LONGITUDE + (random.nextDouble() * (MAXIMUM_LONGITUDE - MINIMUM_LONGITUDE));
-        return new Location(latitude, longitude);
+        return new PlanningLocation(latitude, longitude);
     }
 
     public VaccineType pickVaccineType(Random random) {

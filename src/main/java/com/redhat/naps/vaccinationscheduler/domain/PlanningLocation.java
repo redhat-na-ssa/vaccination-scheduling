@@ -22,7 +22,7 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.sqrt;
 
 @JsonFormat(shape = JsonFormat.Shape.ARRAY)
-public class Location {
+public class PlanningLocation {
 
     // Approximate Metric Equivalents for Degrees. At the equator for longitude and for latitude anywhere,
     // the following approximations are valid: 1° = 111 km (or 60 nautical miles) 0.1° = 11.1 km.
@@ -30,17 +30,17 @@ public class Location {
 
     public final double latitude, longitude;
     
-    public Location() {
+    public PlanningLocation() {
         this.latitude=0.0;
         this.longitude=0.0;
     }
 
-    public Location(double latitude, double longitude) {
+    public PlanningLocation(double latitude, double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    public long getDistanceTo(Location other) {
+    public long getDistanceTo(PlanningLocation other) {
         double latitudeDiff = other.latitude - this.latitude;
         double longitudeDiff = other.longitude - this.longitude;
         return (long) ceil(sqrt(latitudeDiff * latitudeDiff + longitudeDiff * longitudeDiff) * METERS_PER_DEGREE);

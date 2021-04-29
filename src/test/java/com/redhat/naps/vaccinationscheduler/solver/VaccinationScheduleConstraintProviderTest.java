@@ -20,8 +20,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.redhat.naps.vaccinationscheduler.domain.Injection;
-import com.redhat.naps.vaccinationscheduler.domain.Location;
-import com.redhat.naps.vaccinationscheduler.domain.Person;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
 import com.redhat.naps.vaccinationscheduler.domain.VaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.domain.VaccinationSchedule;
 import com.redhat.naps.vaccinationscheduler.domain.VaccineType;
@@ -31,7 +31,7 @@ import org.optaplanner.test.api.score.stream.ConstraintVerifier;
 
 class VaccinationScheduleConstraintProviderTest {
 
-    private static final VaccinationCenter VACCINATION_CENTER_1 = new VaccinationCenter("Alpha", new Location(0, 0), 3);
+    private static final VaccinationCenter VACCINATION_CENTER_1 = new VaccinationCenter("Alpha", new PlanningLocation(0, 0), 3);
     private static final LocalDate MONDAY = LocalDate.of(2021, 2, 1);
     private static final LocalDate TUESDAY = LocalDate.of(2021, 2, 2);
     private static final LocalDate WEDNESDAY = LocalDate.of(2021, 2, 3);
@@ -40,9 +40,9 @@ class VaccinationScheduleConstraintProviderTest {
     private static final LocalDateTime MONDAY_1100 = LocalDateTime.of(2021, 2, 1, 11, 0);
     private static final LocalDateTime TUESDAY_0900 = LocalDateTime.of(2021, 2, 2, 9, 0);
     private static final LocalDateTime WEDNESDAY_0900 = LocalDateTime.of(2021, 2, 3, 9, 0);
-    private static final Person ANN = new Person(1, "Ann", new Location(1, 0), LocalDate.of(1950, 1, 1), 71);
-    private static final Person BETH = new Person(2, "Beth", new Location(2, 0), LocalDate.of(1980, 1, 1), 41);
-    private static final Person CARL = new Person(3, "Carl", new Location(3, 0), LocalDate.of(1970, 1, 1), 51,
+    private static final PlanningPerson ANN = new PlanningPerson(Long.toString(1), "Ann", new PlanningLocation(1, 0), LocalDate.of(1950, 1, 1), 71);
+    private static final PlanningPerson BETH = new PlanningPerson(Long.toString(2), "Beth", new PlanningLocation(2, 0), LocalDate.of(1980, 1, 1), 41);
+    private static final PlanningPerson CARL = new PlanningPerson(Long.toString(3), "Carl", new PlanningLocation(3, 0), LocalDate.of(1970, 1, 1), 51,
             true, VaccineType.MODERNA, MONDAY);
 
     private final ConstraintVerifier<VaccinationScheduleConstraintProvider, VaccinationSchedule> constraintVerifier =
@@ -147,11 +147,11 @@ class VaccinationScheduleConstraintProviderTest {
     void distanceCost() {
         constraintVerifier.verifyThat(VaccinationScheduleConstraintProvider::distanceCost)
                 .given(new Injection(1, VACCINATION_CENTER_1, 0, MONDAY_0900, VaccineType.PFIZER, ANN))
-                .penalizesBy((long) Location.METERS_PER_DEGREE);
+                .penalizesBy((long) PlanningLocation.METERS_PER_DEGREE);
         constraintVerifier.verifyThat(VaccinationScheduleConstraintProvider::distanceCost)
                 .given(new Injection(1, VACCINATION_CENTER_1, 0, MONDAY_0900, VaccineType.PFIZER, ANN),
                         new Injection(2, VACCINATION_CENTER_1, 0, MONDAY_1000, VaccineType.PFIZER, BETH))
-                .penalizesBy(3L * (long) Location.METERS_PER_DEGREE);
+                .penalizesBy(3L * (long) PlanningLocation.METERS_PER_DEGREE);
     }
 
 }

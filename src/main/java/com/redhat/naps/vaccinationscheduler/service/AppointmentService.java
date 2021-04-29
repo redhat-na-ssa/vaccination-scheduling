@@ -1,13 +1,11 @@
 package com.redhat.naps.vaccinationscheduler.service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 
-import com.redhat.naps.vaccinationscheduler.mapping.AppointmentMapper;
+import com.redhat.naps.vaccinationscheduler.mapping.FhirMapper;
 import com.redhat.naps.vaccinationscheduler.persistence.AppointmentRepository;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningAppointment;
 import com.redhat.naps.vaccinationscheduler.entity.AppointmentEntity;
@@ -17,9 +15,9 @@ import com.redhat.naps.vaccinationscheduler.exception.ServiceException;
 public class AppointmentService {
     
     private AppointmentRepository apptRepository;
-    private AppointmentMapper apptMapper;
+    private FhirMapper apptMapper;
     
-    public AppointmentService(AppointmentRepository apptRepository, AppointmentMapper apptMapper) {
+    public AppointmentService(AppointmentRepository apptRepository, FhirMapper apptMapper) {
         this.apptRepository = apptRepository;
         this.apptMapper = apptMapper;
     }

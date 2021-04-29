@@ -7,7 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.redhat.naps.vaccinationscheduler.domain.Person;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
 
 @Path("/recipient/")
 public class RecipientResource {
@@ -15,14 +15,14 @@ public class RecipientResource {
     @POST
     @Path("/request/add")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addRecipientRequest(Person person){
+    public Response addRecipientRequest(PlanningPerson person){
         return Response.ok().build();
     }
 
     @PUT
     @Path("/request/update")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addRecipientRequestUpdate(Person person){
+    public Response addRecipientRequestUpdate(PlanningPerson person){
         return Response.ok().build();
     }
 }

@@ -26,6 +26,7 @@ import com.redhat.naps.vaccinationscheduler.util.FhirUtil;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 
 // https://github.com/hapifhir/hapi-fhir/blob/master/hapi-fhir-base/src/main/java/ca/uhn/fhir/context/FhirContext.java
@@ -71,8 +72,10 @@ public class FhirServerTest {
         }
         Response response = null;
         try {
+            //Retrieve Observation from Bundle
             Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, oJson);
             Observation obs = (Observation)bObj.getEntryFirstRep().getResource();
+
             String obsJson = fhirCtx.newJsonParser().encodeResourceToString(obs);
             response = fhirClient.postObservation(obsJson);
             assertEquals(201, response.getStatus());
@@ -125,6 +128,7 @@ public class FhirServerTest {
         }
         Response response = null;
         try {
+            // Retrieve Organization from Bundle
             Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, hospitalJson);
             Organization org = (Organization)bObj.getEntryFirstRep().getResource();
             String orgJson = fhirCtx.newJsonParser().encodeResourceToString(org);
@@ -155,6 +159,65 @@ public class FhirServerTest {
             gResponse = x.getResponse();
             log.error("hospitalTest() error status = "+gResponse.getStatus()+"  when getting hospital from FhirServer");
             log.error("hospitalTest() error meesage = "+IOUtils.toString((InputStream)gResponse.getEntity(), "UTF-8"));
+        }
+        gResponse.close();
+    }
+
+    @Disabled
+    @Test
+    public void patientTest() throws IOException, InterruptedException {
+
+        // POST
+        String filePath = "/fhir/"+FhirUtil.PATIENT_INFORMATION+".json";
+        InputStream fStream = null;
+        String oJson = null;
+        try {
+            fStream = this.getClass().getResourceAsStream(filePath);
+            if(fStream != null){
+                oJson = IOUtils.toString(fStream, "UTF-8");
+            }else {
+                log.error("patientTest() resource not found: "+filePath);
+                return;
+            }
+        }finally {
+            if(fStream != null)
+            fStream.close();
+        }
+        Response response = null;
+        try {
+            //Retrieve Patient from Bundle
+            Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, oJson);
+            Patient pObj = (Patient)bObj.getEntryFirstRep().getResource();
+            log.info("patientTest() patientId = "+pObj.getId()+" : idbase = "+pObj.getIdBase());
+
+            String obsJson = fhirCtx.newJsonParser().encodeResourceToString(pObj);
+            response = fhirClient.postPatient(obsJson);
+            assertEquals(201, response.getStatus());
+        }catch(WebApplicationException x){
+            response = x.getResponse();
+            log.error("patientTest() error status = "+response.getStatus()+"  when posting the following file content to FhirServer: "+filePath);
+            log.error("patientTest() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
+        }
+        response.close();
+
+        Thread.sleep(5000);
+
+        // GET
+        Response gResponse = null;
+        try {
+            gResponse = fhirClient.getPatients();
+            assertTrue(gResponse.getStatus() == 200 || gResponse.getStatus() == 201);
+            String orgJson = IOUtils.toString((InputStream)gResponse.getEntity(), "UTF-8");
+            Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, orgJson);
+            Patient org = (Patient)bObj.getEntryFirstRep().getResource();
+            List<BundleEntryComponent> becs = bObj.getEntry();
+            log.info("patientTest() # of Patients = "+becs.size());
+            assertTrue(becs.size() > 0);
+
+        }catch(WebApplicationException x) {
+            gResponse = x.getResponse();
+            log.error("patientTest() error status = "+gResponse.getStatus()+"  when getting patients from FhirServer");
+            log.error("patientTest() error meesage = "+IOUtils.toString((InputStream)gResponse.getEntity(), "UTF-8"));
         }
         gResponse.close();
     }

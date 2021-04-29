@@ -39,7 +39,7 @@ public class VaccinationSchedule {
 
     @ProblemFactCollectionProperty
     @ValueRangeProvider(id = "personRange")
-    private List<Person> personList;
+    private List<PlanningPerson> personList;
 
     @PlanningEntityCollectionProperty
     private List<Injection> injectionList;
@@ -54,7 +54,7 @@ public class VaccinationSchedule {
     public VaccinationSchedule() {
     }
 
-    public VaccinationSchedule(List<VaccineType> vaccineTypeList, List<VaccinationCenter> vaccinationCenterList, List<LocalDateTime> timeslotDateTimeList, List<Person> personList, List<Injection> injectionList) {
+    public VaccinationSchedule(List<VaccineType> vaccineTypeList, List<VaccinationCenter> vaccinationCenterList, List<LocalDateTime> timeslotDateTimeList, List<PlanningPerson> personList, List<Injection> injectionList) {
         this.vaccineTypeList = vaccineTypeList;
         this.vaccinationCenterList = vaccinationCenterList;
         this.timeslotDateTimeList = timeslotDateTimeList;
@@ -74,7 +74,7 @@ public class VaccinationSchedule {
         return timeslotDateTimeList;
     }
 
-    public List<Person> getPersonList() {
+    public List<PlanningPerson> getPersonList() {
         return personList;
     }
 

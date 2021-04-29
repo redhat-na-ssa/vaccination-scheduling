@@ -38,7 +38,7 @@ public class Injection {
     private boolean pinned;
 
     @PlanningVariable(valueRangeProviderRefs = {"personRange"})
-    private Person person;
+    private PlanningPerson person;
 
     // No-arg constructor required for OptaPlanner
     public Injection() {
@@ -53,7 +53,7 @@ public class Injection {
         this.vaccineType = vaccineType;
     }
 
-    public Injection(long id, VaccinationCenter vaccinationCenter, int lineIndex, LocalDateTime dateTime, VaccineType vaccineType, Person person) {
+    public Injection(long id, VaccinationCenter vaccinationCenter, int lineIndex, LocalDateTime dateTime, VaccineType vaccineType, PlanningPerson person) {
         this.id = id;
         this.vaccinationCenter = vaccinationCenter;
         this.lineIndex = lineIndex;
@@ -91,11 +91,11 @@ public class Injection {
         return vaccineType;
     }
 
-    public Person getPerson() {
+    public PlanningPerson getPerson() {
         return person;
     }
 
-    public void setPerson(Person person) {
+    public void setPerson(PlanningPerson person) {
         this.person = person;
     }
 

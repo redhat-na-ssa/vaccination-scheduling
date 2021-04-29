@@ -20,13 +20,13 @@ import java.time.LocalDate;
 
 import org.optaplanner.core.api.domain.lookup.PlanningId;
 
-public class Person {
+public class PlanningPerson {
 
     @PlanningId
-    private Long id;
+    private String id;
 
     private String name;
-    private Location homeLocation;
+    private PlanningLocation homeLocation;
     private LocalDate birthdate;
     private int age;
 
@@ -34,13 +34,13 @@ public class Person {
     private VaccineType firstShotVaccineType;
     private LocalDate secondShotIdealDate;
     
-    public Person() {}
+    public PlanningPerson() {}
 
-    public Person(long id, String name, Location homeLocation, LocalDate birthdate, int age) {
+    public PlanningPerson(String id, String name, PlanningLocation homeLocation, LocalDate birthdate, int age) {
         this(id, name, homeLocation, birthdate, age, false, null, null);
     }
 
-    public Person(long id, String name, Location homeLocation, LocalDate birthdate, int age,
+    public PlanningPerson(String id, String name, PlanningLocation homeLocation, LocalDate birthdate, int age,
             boolean firstShotInjected, VaccineType firstShotVaccineType, LocalDate secondShotIdealDate) {
         this.id = id;
         this.name = name;
@@ -52,16 +52,7 @@ public class Person {
         this.secondShotIdealDate = secondShotIdealDate;
     }
 
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    // ************************************************************************
-    // Getters and setters
-    // ************************************************************************
-
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
@@ -69,7 +60,7 @@ public class Person {
         return name;
     }
 
-    public Location getHomeLocation() {
+    public PlanningLocation getHomeLocation() {
         return homeLocation;
     }
 
@@ -92,4 +83,13 @@ public class Person {
     public LocalDate getSecondShotIdealDate() {
         return secondShotIdealDate;
     }
+
+    @Override
+    public String toString() {
+        return "PlanningPerson [age=" + age + ", birthdate=" + birthdate + ", firstShotInjected=" + firstShotInjected
+                + ", firstShotVaccineType=" + firstShotVaccineType + ", homeLocation=" + homeLocation + ", id=" + id
+                + ", name=" + name + ", secondShotIdealDate=" + secondShotIdealDate + "]";
+    }
+
+    
 }

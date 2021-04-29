@@ -22,7 +22,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.redhat.naps.vaccinationscheduler.domain.VaccinationSchedule;
-import com.redhat.naps.vaccinationscheduler.mapping.AppointmentMapper;
+import com.redhat.naps.vaccinationscheduler.mapping.FhirMapper;
 import com.redhat.naps.vaccinationscheduler.service.AppointmentService;
 
 @ApplicationScoped
@@ -31,7 +31,7 @@ public class VaccinationScheduleRepository {
     @Inject
     AppointmentService apptService;
     @Inject
-    AppointmentMapper apptMapper;
+    FhirMapper apptMapper;
 
     private VaccinationSchedule vaccinationSchedule;
     

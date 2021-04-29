@@ -1,7 +1,9 @@
 package com.redhat.naps.vaccinationscheduler.mapping;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -22,17 +24,22 @@ import org.hl7.fhir.r4.model.codesystems.ServiceType;
 import org.hl7.fhir.r4.model.EnumFactory;
 import org.hl7.fhir.r4.model.Enumeration;
 import org.hl7.fhir.r4.model.HealthcareService;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Appointment;
 import org.hl7.fhir.r4.model.CodeableConcept;
 
 import com.redhat.naps.vaccinationscheduler.domain.PlanningAppointment;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
 import com.redhat.naps.vaccinationscheduler.util.FhirUtil;
 
 @ApplicationScoped
-public class AppointmentMapper {
+public class FhirMapper {
 
-    private static Logger log = Logger.getLogger(AppointmentMapper.class);
+    private static Logger log = Logger.getLogger(FhirMapper.class);
 
     private DateTimeFormatter fhirDateTimeFormatter;
     
@@ -50,6 +57,34 @@ public class AppointmentMapper {
     @Inject
     @ConfigProperty(name = FhirUtil.TIMESLOTDURATION_MINUTES, defaultValue = "30")
     int timeSlotDurationMinutes;
+
+
+    public PlanningPerson fromFhirPatientToPlanningPerson(Patient pObj) {
+        HumanName name = pObj.getName().get(0);
+        String fullName = name.getGivenAsSingleString()+" "+name.getFamily();
+
+        Date birthDate = pObj.getBirthDate();
+        if(birthDate == null){
+          log.warnv("{0} fromFhirPatientToPlanningPerson() No birthday from FHIR Patient .... will set to NOW", fullName);
+          birthDate = new Date();
+        }
+        LocalDate lBirthDate = convertToLocalDate(birthDate);
+        Period period = Period.between(lBirthDate, LocalDate.now());
+
+        PlanningLocation pLocation = new PlanningLocation();
+        List<Address> addresses = pObj.getAddress();
+        if(addresses.size() > 0){
+            //TO-DO : Determine lat / long from Patient's Address
+            Address addressObj = pObj.getAddress().get(0);
+            pLocation = new PlanningLocation(90.00, 135.00);
+        }else{
+            log.warnv("{0}  fromFhirPatientToPlanningPerson() No address from patient. Will set to North Pole", fullName);
+            pLocation = new PlanningLocation(90.00, 135.00);
+        }
+
+        PlanningPerson person = new PlanningPerson(pObj.getId(), fullName, pLocation, lBirthDate, period.getYears());
+        return person;
+    }
     
     public  Appointment fromPlanningAppointment(PlanningAppointment aObj) throws FHIRFormatError, IOException{
         
@@ -63,12 +98,12 @@ public class AppointmentMapper {
         String status = aObj.getAppointmentProviderStatus();
         fhirObj.setStatusElement(parseEnumeration(status, new Appointment.AppointmentStatusEnumFactory() ));
 
-        // Person
+        // Patient
         String personName = aObj.getPersonName();
-        Appointment.AppointmentParticipantComponent person = new Appointment.AppointmentParticipantComponent();
-        person.setActor( new Reference( personName ) );
-        person.setId(Long.toString(aObj.getPersonId()));
-        participants.add(person);
+        Appointment.AppointmentParticipantComponent patient = new Appointment.AppointmentParticipantComponent();
+        patient.setActor( new Reference( "Patient/"+aObj.getPersonId()).setDisplay(personName) );
+        patient.setId(aObj.getPersonId());
+        participants.add(patient);
         
         // Location
         String lName = aObj.getVaccinationCenterName();
@@ -118,5 +153,11 @@ public class AppointmentMapper {
 
     private Date convertToDate(LocalDateTime timeObj) {
         return Date.from(timeObj.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    private LocalDate convertToLocalDate(Date dObj) {
+        return dObj.toInstant()
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate();
     }
 }
