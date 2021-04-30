@@ -60,19 +60,6 @@ public class VaccineSchedulingService {
     private static Logger log = Logger.getLogger(VaccineSchedulingService.class);
     private static FhirContext fhirCtx = FhirContext.forR4();
 
-    // Latitude and longitude window of the city of Atlanta, US.
-    public static final double MINIMUM_LATITUDE = 33.40;
-    public static final double MAXIMUM_LATITUDE = 34.10;
-    public static final double MINIMUM_LONGITUDE = -84.90;
-    public static final double MAXIMUM_LONGITUDE = -83.90;
-
-    public static final String[] PERSON_FIRST_NAMES = {
-            "Ann", "Beth", "Carl", "Dan", "Elsa", "Flo", "Gus", "Hugo", "Ivy", "Jay",
-            "Kurt", "Luke", "Mia", "Noa", "Otto", "Paul", "Quin", "Ray", "Sue", "Taj",
-            "Uma", "Vix", "Wade", "Xiu" , "Yuna", "Zara"};
-    public static final LocalDate MINIMUM_BIRTH_DATE = LocalDate.of(1930, 1, 1);
-    public static final int BIRTH_DATE_RANGE_LENGTH = (int) DAYS.between(MINIMUM_BIRTH_DATE, LocalDate.of(2000, 1, 1));
-
     @Inject
     @RestClient
     FhirServerClient fhirClient;
@@ -82,20 +69,9 @@ public class VaccineSchedulingService {
 
     private VaccinationSchedule vSchedule;
     
-    /*
-    TO-DO: Pull needed Resources from FHIR Server IOT create VaccinationSchedule object
-    */
     public VaccinationSchedule refreshVaccinationSchedule() throws IOException {
-        LocalDate windowStartDate = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
-        int windowDaysLength = 5;
-        LocalTime dayStartTime = LocalTime.of(9, 0);
-        int injectionDurationInMinutes = 30;
-        int injectionsPerLinePerDay = (int) (MINUTES.between(dayStartTime, LocalTime.of(17, 0))
-        / injectionDurationInMinutes);
-        
-        Random random = new Random(17);
-        List<VaccineType> vaccineTypeList = List.of(VaccineType.values());
 
+        // Retrieve all evacuation center data from FHIR Server
         List<PlanningVaccinationCenter> vaccinationCenterList = new ArrayList<>();
         Response gResponse = null;
         try {
@@ -119,19 +95,11 @@ public class VaccineSchedulingService {
             gResponse.close();
         }
         
-        int lineTotal = vaccinationCenterList.stream().mapToInt(PlanningVaccinationCenter::getLineCount).sum();
+
         
-        List<LocalDateTime> timeslotDateTimeList = new ArrayList<>(windowDaysLength * injectionsPerLinePerDay);
-        for (int dayIndex = 0; dayIndex < windowDaysLength; dayIndex++) {
-            LocalDate date = windowStartDate.plusDays(dayIndex);
-            for (int timeIndex = 0; timeIndex < injectionsPerLinePerDay; timeIndex++) {
-                LocalTime time = dayStartTime.plusMinutes(injectionDurationInMinutes * timeIndex);
-                timeslotDateTimeList.add(LocalDateTime.of(date, time));
-            }
-        }
-        
-        int personListSize = (lineTotal * injectionsPerLinePerDay * windowDaysLength) * 5 / 4; // 25% too many
-        List<PlanningPerson> personList = new ArrayList<>(personListSize);
+
+        // Retrieve all patients from FHIR server
+        List<PlanningPerson> personList = new ArrayList<>();
         Response pResponse = null;
         try {
             pResponse = fhirClient.getPatients();
@@ -153,8 +121,33 @@ public class VaccineSchedulingService {
         }finally{
             pResponse.close();
         }
+
+
+        // TO-DO:  As per FIHR R4 Immunization.manufacturer,  maybe this should be implemented as a list of FHIR Organizations ?
+        List<VaccineType> vaccineTypeList = List.of(VaccineType.values());
+
+
+        // TO-DO:  Seems as of this should be made configurable
+        LocalDate windowStartDate = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        int windowDaysLength = 5;
+        LocalTime dayStartTime = LocalTime.of(9, 0);
+        int injectionDurationInMinutes = 30;
+        int injectionsPerLinePerDay = (int) (MINUTES.between(dayStartTime, LocalTime.of(17, 0)) / injectionDurationInMinutes);
+
+        int lineTotal = vaccinationCenterList.stream().mapToInt(PlanningVaccinationCenter::getLineCount).sum();
+        List<LocalDateTime> timeslotDateTimeList = new ArrayList<>(windowDaysLength * injectionsPerLinePerDay);
+        for (int dayIndex = 0; dayIndex < windowDaysLength; dayIndex++) {
+            LocalDate date = windowStartDate.plusDays(dayIndex);
+            for (int timeIndex = 0; timeIndex < injectionsPerLinePerDay; timeIndex++) {
+                LocalTime time = dayStartTime.plusMinutes(injectionDurationInMinutes * timeIndex);
+                timeslotDateTimeList.add(LocalDateTime.of(date, time));
+            }
+        }
         
-        List<Injection> injectionList = new ArrayList<>();
+
+        // TO-DO:  What is the FHIR equivalent of injection supply at each vaccination center ?
+        Random random = new Random(17);
+        List<Injection> injectionList = new ArrayList<Injection>();
         long injectionId = 0L;
         for (PlanningVaccinationCenter vaccinationCenter : vaccinationCenterList) {
             for (int dayIndex = 0; dayIndex < windowDaysLength; dayIndex++) {
@@ -184,21 +177,31 @@ public class VaccineSchedulingService {
         
     /*
         Given a new VaccinationSchedule, post Appointments to FHIR Server
+
+        TO-DO:  Probably best to place a lock on this function
     */
     public void saveVaccinationSchedule(VaccinationSchedule vSchedule) {
-        // TO-DO:  Post to FHIR Server
+
         this.vSchedule = vSchedule;
+        
+        if(this.vSchedule!=null && !this.vSchedule.getInjectionList().isEmpty()) {
+            List<Injection> injections = vSchedule.getInjectionList();
+            log.info("saveVaccinationSchedule() Persisting injection list of size: "+injections.size());
+            for(Injection i : injections) { 
+                if(i!=null && i.getPerson()!=null && i.getId()!=null) {
+                    log.trace("Persisting appointment for injection with id: "+i.getId());
+
+                    //fhirMapper.
+                    //apptService.saveOrUpdate(apptMapper.fromInjection(i));
+                }
+            }
+        }
     }
     
     public void handleException(Long l, Throwable t) {
         log.error("Error during solver execution: "+t.getMessage());
     }
 
-    public PlanningLocation pickLocation(Random random) {
-        double latitude = MINIMUM_LATITUDE + (random.nextDouble() * (MAXIMUM_LATITUDE - MINIMUM_LATITUDE));
-        double longitude = MINIMUM_LONGITUDE + (random.nextDouble() * (MAXIMUM_LONGITUDE - MINIMUM_LONGITUDE));
-        return new PlanningLocation(latitude, longitude);
-    }
 
     public VaccineType pickVaccineType(Random random) {
         double randomDouble = random.nextDouble();
