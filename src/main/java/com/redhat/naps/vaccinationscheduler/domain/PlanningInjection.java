@@ -24,7 +24,7 @@ import org.optaplanner.core.api.domain.lookup.PlanningId;
 import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
 @PlanningEntity
-public class Injection {
+public class PlanningInjection {
 
     @PlanningId
     private Long id;
@@ -41,10 +41,10 @@ public class Injection {
     private PlanningPerson person;
 
     // No-arg constructor required for OptaPlanner
-    public Injection() {
+    public PlanningInjection() {
     }
 
-    public Injection(Long id, PlanningVaccinationCenter vaccinationCenter, int lineIndex,
+    public PlanningInjection(Long id, PlanningVaccinationCenter vaccinationCenter, int lineIndex,
             LocalDateTime dateTime, VaccineType vaccineType) {
         this.id = id;
         this.vaccinationCenter = vaccinationCenter;
@@ -53,7 +53,7 @@ public class Injection {
         this.vaccineType = vaccineType;
     }
 
-    public Injection(long id, PlanningVaccinationCenter vaccinationCenter, int lineIndex, LocalDateTime dateTime, VaccineType vaccineType, PlanningPerson person) {
+    public PlanningInjection(long id, PlanningVaccinationCenter vaccinationCenter, int lineIndex, LocalDateTime dateTime, VaccineType vaccineType, PlanningPerson person) {
         this.id = id;
         this.vaccinationCenter = vaccinationCenter;
         this.lineIndex = lineIndex;

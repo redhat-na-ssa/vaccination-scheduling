@@ -18,7 +18,7 @@ package com.redhat.naps.vaccinationscheduler.solver;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
-import com.redhat.naps.vaccinationscheduler.domain.Injection;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningInjection;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
 import com.redhat.naps.vaccinationscheduler.domain.VaccineType;
 import org.optaplanner.core.api.score.buildin.hardmediumsoftlong.HardMediumSoftLongScore;
@@ -48,15 +48,15 @@ public class VaccinationScheduleConstraintProvider implements ConstraintProvider
         // In this implementation, a planning window is at most 2 weeks,
         // so the 1th and 2nd shot won't be in the same schedule (this can be fixed by changing the model).
         return constraintFactory
-                .fromUniquePair(Injection.class,
-                        Joiners.equal(Injection::getPerson))
+                .fromUniquePair(PlanningInjection.class,
+                        Joiners.equal(PlanningInjection::getPerson))
                 .penalize("Person conflict", HardMediumSoftLongScore.ofHard(100));
     }
 
     Constraint ageLimitAstrazeneca(ConstraintFactory constraintFactory) {
         // Don't inject older people with AstraZeneca
         return constraintFactory
-                .from(Injection.class)
+                .from(PlanningInjection.class)
                 .filter(injection -> injection.getPerson().getAge() >= 55
                         && injection.getVaccineType() == VaccineType.ASTRAZENECA)
                 .penalize("Age limit AstraZeneca", HardMediumSoftLongScore.ONE_HARD);
@@ -65,7 +65,7 @@ public class VaccinationScheduleConstraintProvider implements ConstraintProvider
     Constraint secondShotInvalidVaccineType(ConstraintFactory constraintFactory) {
         // If a person is coming for their 2nd shot, use the same vaccine type as their 1th shot.
         return constraintFactory
-                .from(Injection.class)
+                .from(PlanningInjection.class)
                 .filter((injection -> injection.getPerson().isFirstShotInjected()
                         && injection.getVaccineType() != injection.getPerson().getFirstShotVaccineType()))
                 .penalize("Second shot invalid vaccine type", HardMediumSoftLongScore.ofHard(100));
@@ -76,7 +76,7 @@ public class VaccinationScheduleConstraintProvider implements ConstraintProvider
         return constraintFactory
                 .from(PlanningPerson.class)
                 .filter(PlanningPerson::isFirstShotInjected)
-                .ifNotExists(Injection.class, Joiners.equal(person -> person, Injection::getPerson))
+                .ifNotExists(PlanningInjection.class, Joiners.equal(person -> person, PlanningInjection::getPerson))
                 .penalize("Second shot must be assigned", HardMediumSoftLongScore.ONE_HARD);
     }
 
@@ -84,7 +84,7 @@ public class VaccinationScheduleConstraintProvider implements ConstraintProvider
         // Schedule all older people for an injection. This is softer than secondShotMustBeAssigned().
         return constraintFactory
                 .from(PlanningPerson.class)
-                .ifNotExists(Injection.class, Joiners.equal(person -> person, Injection::getPerson))
+                .ifNotExists(PlanningInjection.class, Joiners.equal(person -> person, PlanningInjection::getPerson))
                 .penalizeLong("Assign all older people", HardMediumSoftLongScore.ONE_MEDIUM, PlanningPerson::getAge);
     }
 
@@ -92,7 +92,7 @@ public class VaccinationScheduleConstraintProvider implements ConstraintProvider
         // If a person is coming for their 2nd shot, inject it on the ideal day.
         // For example, Pfizer is ideally injected 21 days after the first shot. Moderna after 28 days.
         return constraintFactory
-                .from(Injection.class)
+                .from(PlanningInjection.class)
                 .filter(injection -> injection.getPerson().isFirstShotInjected()
                         && !injection.getPerson().getSecondShotIdealDate().equals(injection.getDateTime().toLocalDate()))
                 // 2_000_000 means that to get closer to the ideal day, the person is willing to ride to extra 2km
@@ -105,7 +105,7 @@ public class VaccinationScheduleConstraintProvider implements ConstraintProvider
     Constraint distanceCost(ConstraintFactory constraintFactory) {
         // Minimize the distance from each person's home location to the vaccination center
         return constraintFactory
-                .from(Injection.class)
+                .from(PlanningInjection.class)
                 .penalizeLong("Distance cost", HardMediumSoftLongScore.ofSoft(1000),
                         injection -> injection.getPerson().getHomeLocation().getDistanceTo(
                                 injection.getVaccinationCenter().getLocation()));

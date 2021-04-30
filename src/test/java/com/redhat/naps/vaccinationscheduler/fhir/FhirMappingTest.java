@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,8 @@ import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningAppointment;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningInjection;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
 import com.redhat.naps.vaccinationscheduler.domain.VaccineType;
 import com.redhat.naps.vaccinationscheduler.mapping.FhirMapper;
 import com.redhat.naps.vaccinationscheduler.rest.FhirServerClient;
@@ -128,13 +131,13 @@ public class FhirMappingTest {
     */
     @Disabled
     @Test
-    public void mapPlanningAppointmentToFhirAppointmentTest() throws FHIRFormatError, IOException {
+    public void mapPlanningInjectionToFhirAppointmentTest() throws FHIRFormatError, IOException {
         String patientId = "210";
         String patientName = "RHT Shadowman";
-        PlanningAppointment oAppointment = createSamplePlanningAppointment(patientId, patientName);
+        PlanningInjection pInjection = createSamplePlanningInjection(patientId, patientName);
         
         try {
-            Appointment appObj = fhirMapper.fromPlanningAppointment(oAppointment);
+            Appointment appObj = fhirMapper.fromPlanningInjectionToFhirAppointment(pInjection);
             String appJson = fhirCtx.newJsonParser().encodeResourceToString(appObj);
     
             log.info("mapPlanningAppointmentToFhirAppointmentTest() appJSON = \n\n"+appJson+"\n");
@@ -164,8 +167,6 @@ public class FhirMappingTest {
         }
     }
 
-
-
     private Patient createSampleFhirPatient(String patientId, String patientName) {
         Patient pObj = new Patient();
         pObj.getIdentifier().add(new Identifier().setValue(patientId));
@@ -177,16 +178,12 @@ public class FhirMappingTest {
         return pObj;
     }
     
-    private PlanningAppointment createSamplePlanningAppointment(String patientId, String patientName) {
-        PlanningAppointment oAppointment = new PlanningAppointment();
-        oAppointment.setAppointmentId(1001L);
-        oAppointment.setAppointmentProviderStatus(Appointment.AppointmentStatus.CANCELLED.toCode());
-        oAppointment.setAppointmentRecipientStatus(Appointment.AppointmentStatus.FULFILLED.toCode());
-        oAppointment.setPersonId(patientId);
-        oAppointment.setPersonName(patientName);
-        oAppointment.setVaccineType(VaccineType.MODERNA);
-        oAppointment.setTimeslotDateTime(LocalDateTime.now());
-        return oAppointment;
+    private PlanningInjection createSamplePlanningInjection(String patientId, String patientName) {
+
+        PlanningPerson person = new PlanningPerson(patientId, patientName, null, LocalDate.now(), 77, false, VaccineType.MODERNA, LocalDate.now());
+        PlanningVaccinationCenter pvc = new PlanningVaccinationCenter("CHANGEME", new PlanningLocation(90.00, 135.00), 1);
+        PlanningInjection pInjection = new PlanningInjection(1001L, pvc, 1, LocalDateTime.now(), VaccineType.MODERNA, person);
+        return pInjection;
     }
 
 

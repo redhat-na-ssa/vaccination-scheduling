@@ -1,6 +1,7 @@
 package com.redhat.naps.vaccinationscheduler.mapping;
 
 
+import com.redhat.naps.vaccinationscheduler.domain.PlanningInjection;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -114,27 +115,27 @@ public class FhirMapper {
         return person;
     }
     
-    public  Appointment fromPlanningAppointment(PlanningAppointment aObj) throws FHIRFormatError, IOException{
+    public  Appointment fromPlanningInjectionToFhirAppointment(PlanningInjection aObj) throws FHIRFormatError, IOException{
         
         Appointment fhirObj = new Appointment();
         List<Appointment.AppointmentParticipantComponent> participants = new ArrayList<Appointment.AppointmentParticipantComponent>();
 
         // Id
-        fhirObj.setId(Long.toString( aObj.getAppointmentId()));
+        fhirObj.setId(Long.toString( aObj.getId() ));
         
         // Status
-        String status = aObj.getAppointmentProviderStatus();
-        fhirObj.setStatusElement(parseEnumeration(status, new Appointment.AppointmentStatusEnumFactory() ));
+        //String status = aObj.;
+        //fhirObj.setStatusElement(parseEnumeration(status, new Appointment.AppointmentStatusEnumFactory() ));
 
         // Patient
-        String personName = aObj.getPersonName();
+        String personName = aObj.getPerson().getName();
         Appointment.AppointmentParticipantComponent patient = new Appointment.AppointmentParticipantComponent();
-        patient.setActor( new Reference( "Patient/"+aObj.getPersonId()).setDisplay(personName) );
-        patient.setId(aObj.getPersonId());
+        patient.setActor( new Reference( "Patient/"+aObj.getPerson().getId() ).setDisplay(personName) );
+        patient.setId(aObj.getPerson().getId() );
         participants.add(patient);
         
         // Location
-        String lName = aObj.getVaccinationCenterName();
+        String lName = aObj.getVaccinationCenter().getName();
         HealthcareService hCareService = new HealthcareService();
         hCareService.addLocation(new Reference(lName));
         Appointment.AppointmentParticipantComponent location = new Appointment.AppointmentParticipantComponent();
@@ -151,7 +152,7 @@ public class FhirMapper {
         immunizationConcept.setText(aObj.getVaccineType().name());
 
         // As text, specify whether this is the firstDoseAdministered
-        immunizationConcept.setText(FhirUtil.FIRST_DOSE_ADMINISTERED +" : "+aObj.getIsFirstDoseAdministered());
+        immunizationConcept.setText(FhirUtil.FIRST_DOSE_ADMINISTERED +" : "+aObj.getPerson().isFirstShotInjected() );
 
         Appointment.AppointmentParticipantComponent immunization = new Appointment.AppointmentParticipantComponent();
         immunization.setType(concepts);
@@ -161,7 +162,7 @@ public class FhirMapper {
              start: 2013-12-09T09:00:00Z
              end:   2013-12-09T11:00:00Z
          */
-        LocalDateTime startTime = aObj.getTimeslotDateTime();
+        LocalDateTime startTime = aObj.getDateTime();
         LocalDateTime endTime = startTime.now().plusMinutes(timeSlotDurationMinutes);
         fhirObj.setStart(convertToDate(startTime));
         fhirObj.setEnd(convertToDate(endTime));

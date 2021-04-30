@@ -39,7 +39,7 @@ import org.jboss.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import com.redhat.naps.vaccinationscheduler.domain.Injection;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningInjection;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
@@ -48,6 +48,8 @@ import com.redhat.naps.vaccinationscheduler.domain.VaccineType;
 import com.redhat.naps.vaccinationscheduler.mapping.FhirMapper;
 import com.redhat.naps.vaccinationscheduler.rest.FhirServerClient;
 
+import org.hl7.fhir.exceptions.FHIRFormatError;
+import org.hl7.fhir.r4.model.Appointment;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
@@ -147,7 +149,7 @@ public class VaccineSchedulingService {
 
         // TO-DO:  What is the FHIR equivalent of injection supply at each vaccination center ?
         Random random = new Random(17);
-        List<Injection> injectionList = new ArrayList<Injection>();
+        List<PlanningInjection> injectionList = new ArrayList<PlanningInjection>();
         long injectionId = 0L;
         for (PlanningVaccinationCenter vaccinationCenter : vaccinationCenterList) {
             for (int dayIndex = 0; dayIndex < windowDaysLength; dayIndex++) {
@@ -156,7 +158,7 @@ public class VaccineSchedulingService {
                     VaccineType vaccineType = pickVaccineType(random);
                     for (int timeIndex = 0; timeIndex < injectionsPerLinePerDay; timeIndex++) {
                         LocalTime time = dayStartTime.plusMinutes(injectionDurationInMinutes * timeIndex);
-                        injectionList.add(new Injection(
+                        injectionList.add(new PlanningInjection(
                             injectionId++, vaccinationCenter, lineIndex,
                             LocalDateTime.of(date, time), vaccineType)
                         );
@@ -185,15 +187,31 @@ public class VaccineSchedulingService {
         this.vSchedule = vSchedule;
         
         if(this.vSchedule!=null && !this.vSchedule.getInjectionList().isEmpty()) {
-            List<Injection> injections = vSchedule.getInjectionList();
+            List<PlanningInjection> injections = vSchedule.getInjectionList();
             log.info("saveVaccinationSchedule() Persisting injection list of size: "+injections.size());
-            for(Injection i : injections) { 
-                if(i!=null && i.getPerson()!=null && i.getId()!=null) {
-                    log.trace("Persisting appointment for injection with id: "+i.getId());
-
-                    //fhirMapper.
-                    //apptService.saveOrUpdate(apptMapper.fromInjection(i));
+            try {
+                for(PlanningInjection i : injections) { 
+                    if(i!=null && i.getPerson()!=null && i.getId()!=null) {
+                        log.trace("Persisting appointment for injection with id: "+i.getId());
+    
+                        Appointment aObj = fhirMapper.fromPlanningInjectionToFhirAppointment(i);
+                        Response response = null;
+                        try {
+                            String aJson = fhirCtx.newJsonParser().encodeResourceToString(aObj);
+                            response = fhirClient.postPatient(aJson);
+                        }catch(WebApplicationException x){
+                            response = x.getResponse();
+                            log.error("saveVaccinationSchedule() error status = "+response.getStatus()+"  when posting Appointment to FhirServer: "+aObj.getId());
+                            log.error("saveVaccinationSchedule() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
+                            throw x;
+                        }finally {
+                            response.close();
+                        }
+                        
+                    }
                 }
+            }catch(Exception x) {
+                throw new RuntimeException(x);
             }
         }
     }

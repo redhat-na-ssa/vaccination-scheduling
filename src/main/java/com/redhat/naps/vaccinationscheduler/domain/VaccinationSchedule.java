@@ -42,7 +42,7 @@ public class VaccinationSchedule {
     private List<PlanningPerson> personList;
 
     @PlanningEntityCollectionProperty
-    private List<Injection> injectionList;
+    private List<PlanningInjection> injectionList;
 
     @PlanningScore
     private HardMediumSoftLongScore score;
@@ -54,7 +54,7 @@ public class VaccinationSchedule {
     public VaccinationSchedule() {
     }
 
-    public VaccinationSchedule(List<VaccineType> vaccineTypeList, List<PlanningVaccinationCenter> vaccinationCenterList, List<LocalDateTime> timeslotDateTimeList, List<PlanningPerson> personList, List<Injection> injectionList) {
+    public VaccinationSchedule(List<VaccineType> vaccineTypeList, List<PlanningVaccinationCenter> vaccinationCenterList, List<LocalDateTime> timeslotDateTimeList, List<PlanningPerson> personList, List<PlanningInjection> injectionList) {
         this.vaccineTypeList = vaccineTypeList;
         this.vaccinationCenterList = vaccinationCenterList;
         this.timeslotDateTimeList = timeslotDateTimeList;
@@ -82,7 +82,7 @@ public class VaccinationSchedule {
         this.personList = personList;
     }
 
-    public void setInjectionList(List<Injection> injectionList) {
+    public void setInjectionList(List<PlanningInjection> injectionList) {
         this.injectionList = injectionList;
     }
 
@@ -102,7 +102,7 @@ public class VaccinationSchedule {
         return personList;
     }
 
-    public List<Injection> getInjectionList() {
+    public List<PlanningInjection> getInjectionList() {
         return injectionList;
     }
 
