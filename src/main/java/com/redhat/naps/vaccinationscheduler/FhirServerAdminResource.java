@@ -1,4 +1,4 @@
-package com.redhat.naps.vaccinationscheduler.bootstrap;
+package com.redhat.naps.vaccinationscheduler;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,15 +9,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
 import javax.annotation.Priority;
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import io.quarkus.runtime.StartupEvent;
+import org.jboss.logging.Logger;
 
-import com.redhat.naps.vaccinationscheduler.util.FhirUtil;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -25,29 +27,20 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
-import org.jboss.logging.Logger;
+import ca.uhn.fhir.context.FhirContext;
 
 import org.mitre.synthea.engine.Generator;
 import org.mitre.synthea.helpers.Config;
-
-import ca.uhn.fhir.context.FhirContext;
-
 import org.mitre.synthea.export.Exporter;
 
+import com.redhat.naps.vaccinationscheduler.util.FhirUtil;
 import com.redhat.naps.vaccinationscheduler.rest.FhirServerClient;
 
-@ApplicationScoped
-public class FhirDataGenerator {
+@Path("/fhirServerAdmin")
+public class FhirServerAdminResource {
 
     private static FhirContext fhirCtx = FhirContext.forR4();
-
-    @Inject
-    @ConfigProperty(name = FhirUtil.GENERATE_PATIENTS, defaultValue = "false")
-    boolean generatePatients;
-
-    @Inject
-    @ConfigProperty(name = FhirUtil.PATIENT_GENERATOR_COUNT, defaultValue = "50")
-    int patientGeneratorCount;
+    private static Logger log = Logger.getLogger(FhirServerAdminResource.class);
 
     @Inject
     @ConfigProperty(name = FhirUtil.PATIENT_GENERATOR_STATE, defaultValue = "Michigan")
@@ -65,23 +58,22 @@ public class FhirDataGenerator {
     @RestClient
     FhirServerClient fhirClient;
 
-    private static Logger log = Logger.getLogger(FhirDataGenerator.class);
-
-    public void onStart(@Observes @Priority(value = 1) StartupEvent ev) throws InterruptedException, IOException {
-        if(!generatePatients){
-            log.info("onStart() .... will not generate patients");
-            return;
-        }
+    public void onStart(@Observes @Priority(value = 1) StartupEvent ev) {
+    }
+    
+    @POST
+    @Path("/seedFhirServer/{patientGeneratorCount}")
+    public Response seedFhirServer(@PathParam("patientGeneratorCount") int patientGeneratorCount) throws InterruptedException, IOException {
 
         // 1)  Define a directory on the filesystem where output files will be written to
         long randomSeed = ThreadLocalRandom.current().nextLong(100, 100000);
         String outputDir = this.patientGeneratorBaseDir+"/"+randomSeed+"/";
-        log.info("onStart() .... will generate the following # of patients: "+this.patientGeneratorCount+" to output dir = "+outputDir);
+        log.info("onStart() .... will generate the following # of patients: "+patientGeneratorCount+" to output dir = "+outputDir);
 
 
         // 2)  Control demographics of population
         Generator.GeneratorOptions options = new Generator.GeneratorOptions();
-        options.population = this.patientGeneratorCount;
+        options.population = patientGeneratorCount;
         options.city = this.patientGeneratorCity;
         options.state = this.patientGeneratorState;
         options.seed = randomSeed;
@@ -102,7 +94,7 @@ public class FhirDataGenerator {
         generatorService.submit(() -> generator.run());
 
         // 5)  Seed FHIR Server with patient resources
-        seedPatients(ero);
+        seedPatients(patientGeneratorCount, ero);
 
         generatorService.shutdownNow();
         
@@ -110,9 +102,11 @@ public class FhirDataGenerator {
         
         // 6) Seed FHIR Server with Hospital and Practitioner resources
         seedHospitalAndPractitioners(outputDir);
+
+        return Response.ok(patientGeneratorCount).build();
     }
     
-    private void seedPatients(Exporter.ExporterRuntimeOptions ero) throws InterruptedException, IOException {
+    private void seedPatients(int patientGeneratorCount, Exporter.ExporterRuntimeOptions ero) throws InterruptedException, IOException {
         int fhirRecordCount = 0;
         while(fhirRecordCount < patientGeneratorCount) {
             String jsonRecord = ero.getNextRecord();

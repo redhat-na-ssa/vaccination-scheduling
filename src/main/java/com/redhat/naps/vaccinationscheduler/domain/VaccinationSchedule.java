@@ -66,6 +66,30 @@ public class VaccinationSchedule {
         return vaccineTypeList;
     }
 
+    public void setVaccineTypeList(List<VaccineType> vaccineTypeList) {
+        this.vaccineTypeList = vaccineTypeList;
+    }
+
+    public void setVaccinationCenterList(List<PlanningVaccinationCenter> vaccinationCenterList) {
+        this.vaccinationCenterList = vaccinationCenterList;
+    }
+
+    public void setTimeslotDateTimeList(List<LocalDateTime> timeslotDateTimeList) {
+        this.timeslotDateTimeList = timeslotDateTimeList;
+    }
+
+    public void setPersonList(List<PlanningPerson> personList) {
+        this.personList = personList;
+    }
+
+    public void setInjectionList(List<Injection> injectionList) {
+        this.injectionList = injectionList;
+    }
+
+    public void setScore(HardMediumSoftLongScore score) {
+        this.score = score;
+    }
+
     public List<PlanningVaccinationCenter> getVaccinationCenterList() {
         return vaccinationCenterList;
     }

@@ -1,6 +1,6 @@
 package com.redhat.naps.vaccinationscheduler.mapping;
 
-import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,14 +29,15 @@ import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.Slot;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Appointment;
 import org.hl7.fhir.r4.model.CodeableConcept;
 
+import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningAppointment;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
-import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.util.FhirUtil;
 
 @ApplicationScoped
@@ -47,7 +48,6 @@ public class FhirMapper {
     private DateTimeFormatter fhirDateTimeFormatter;
     
     void onStart(@Observes @Priority(value = 1) StartupEvent ev) {
-        log.info("onStart() .... ");
         try {
             // https://www.hl7.org/fhir/datatypes.html
             fhirDateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-DDhh:mm:ss+zz:zz");
@@ -60,6 +60,12 @@ public class FhirMapper {
     @Inject
     @ConfigProperty(name = FhirUtil.TIMESLOTDURATION_MINUTES, defaultValue = "30")
     int timeSlotDurationMinutes;
+
+    public LocalDateTime fromFhirSlotToPlanningSlot(Slot fhirSlot){
+
+        LocalDateTime ldt = convertToLocalDateTime(fhirSlot.getStart());
+        return ldt;
+    }
 
     public PlanningVaccinationCenter fromFhirOrganizationToPlanningVaccinationCenter(Organization pObj) {
         String name = pObj.getName();
@@ -178,9 +184,11 @@ public class FhirMapper {
     }
 
     private LocalDate convertToLocalDate(Date dObj) {
-        return dObj.toInstant()
-        .atZone(ZoneId.systemDefault())
-        .toLocalDate();
+        return dObj.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    private LocalDateTime convertToLocalDateTime(Date dObj) {
+        return dObj.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
 

@@ -2,12 +2,10 @@ package com.redhat.naps.vaccinationscheduler.util;
 
 public class FhirUtil {
 
-    public static final String GENERATE_PATIENTS="com.redhat.vaccination.scheduling.generatePatients";
-    public static final String PATIENT_GENERATOR_COUNT="com.redhat.vaccination.scheduling.patientGeneratorCount";
-    public static final String PATIENT_GENERATOR_STATE="com.redhat.vaccination.scheduling.patientGeneratorState";
-    public static final String PATIENT_GENERATOR_CITY="com.redhat.vaccination.scheduling.patientGeneratorCity";
-    public static final String PATIENT_GENERATOR_BASE_DIR="com.redhat.vaccination.scheduling.patientGeneratorBaseDir";
-    public static final String TIMESLOTDURATION_MINUTES="com.redhat.vaccination.scheduling.timeslotduration.minutes";
+    public static final String PATIENT_GENERATOR_STATE="com.redhat.naps.vaccinationscheduler.patientGeneratorState";
+    public static final String PATIENT_GENERATOR_CITY="com.redhat.naps.vaccinationscheduler.patientGeneratorCity";
+    public static final String PATIENT_GENERATOR_BASE_DIR="com.redhat.naps.vaccinationscheduler.patientGeneratorBaseDir";
+    public static final String TIMESLOTDURATION_MINUTES="com.redhat.naps.vaccinationscheduler.timeslotduration.minutes";
 
     public static final String HOSPITAL_INFORMATION="hospitalInformation";
     public static final String PRACTITIONER_INFORMATION="practitionerInformation";

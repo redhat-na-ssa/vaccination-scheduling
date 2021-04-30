@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.redhat.naps.vaccinationscheduler.bootstrap;
+package com.redhat.naps.vaccinationscheduler;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.MINUTES;
@@ -29,15 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.IOException;
-
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.redhat.naps.vaccinationscheduler.domain.Injection;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
@@ -45,24 +39,14 @@ import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.domain.VaccinationSchedule;
 import com.redhat.naps.vaccinationscheduler.domain.VaccineType;
-import com.redhat.naps.vaccinationscheduler.persistence.VaccinationScheduleRepository;
-
-import io.quarkus.runtime.StartupEvent;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.redhat.naps.vaccinationscheduler.rest.FhirServerClient;
 
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
-public class DemoDataGenerator {
+public class VaccineSchedulingService {
 
-    private static final String SEED_DATA_FILE_PATH = "com.redhat.vaccination.scheduling.seed.file.path";
-    private static final String SEED_DATA_DUMP_TO_FILE = "com.redhat.vaccination.scheduling.seed.dump.to.file";
-    private static final String SEED_DATA_DUMP_PATH = "com.redhat.vaccination.scheduling.seed.dump.path";
-    private static Logger log = Logger.getLogger(DemoDataGenerator.class);
+    private static Logger log = Logger.getLogger(VaccineSchedulingService.class);
 
     // Latitude and longitude window of the city of Atlanta, US.
     public static final double MINIMUM_LATITUDE = 33.40;
@@ -77,63 +61,23 @@ public class DemoDataGenerator {
     public static final LocalDate MINIMUM_BIRTH_DATE = LocalDate.of(1930, 1, 1);
     public static final int BIRTH_DATE_RANGE_LENGTH = (int) DAYS.between(MINIMUM_BIRTH_DATE, LocalDate.of(2000, 1, 1));
 
-    @ConfigProperty(name = SEED_DATA_FILE_PATH)
-    String seedFilePath;
-
-    @ConfigProperty(name = SEED_DATA_DUMP_TO_FILE, defaultValue="false")
-    String dumpSeedFileDataString;
-
-    @ConfigProperty(name = SEED_DATA_DUMP_PATH, defaultValue="/tmp/vSchedule.json")
-    String dumpSeedFilePath;
-
     @Inject
-    VaccinationScheduleRepository vaccinationScheduleRepository;
+    @RestClient
+    FhirServerClient fclient;
 
-    private ObjectMapper mapper = new ObjectMapper();
-
-    public void loadSeedData(@Observes StartupEvent startupEvent) throws JsonProcessingException, IOException {
-
-        // No longer used
-        if(true)
-          return;
-
-        VaccinationSchedule vSchedule = null;
-        InputStream fStream = this.getClass().getResourceAsStream(seedFilePath);
-        try {
-            if(fStream == null) {
-                File vFile = new File(seedFilePath);
-                if(!vFile.exists()) {
-                    log.error("loadSeedData() the following file does not exist:  "+seedFilePath+" ;  will utilize original vaccination scheduling demo data to seed planning engine");
-                    throw new RuntimeException();
-                } else {
-                    fStream = new FileInputStream(vFile);
-                }
-            }
-            mapper.registerModule(new JavaTimeModule());
-            vSchedule = mapper.readValue(fStream, VaccinationSchedule.class);
-            log.info("loadSeedData()  seed file path used: "+seedFilePath+"  ; # of injections in seed file: "+vSchedule.getInjectionList().size());
-
-        }finally{
-            if(fStream != null)
-                fStream.close();
-        }
-
-        boolean dumpSeedFileData = Boolean.parseBoolean(dumpSeedFileDataString);
-        if(dumpSeedFileData) {
-            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            mapper.writeValue(new File(dumpSeedFilePath), vSchedule);
-        }
-        vaccinationScheduleRepository.save(vSchedule);
-    }
-
-    private VaccinationSchedule generateDemoVaccinationSchedule() {
+    private VaccinationSchedule vSchedule;
+    
+    /*
+    TO-DO: Pull needed Resources from FHIR Server IOT create VaccinationSchedule object
+    */
+    public VaccinationSchedule refreshVaccinationSchedule() {
         LocalDate windowStartDate = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         int windowDaysLength = 5;
         LocalTime dayStartTime = LocalTime.of(9, 0);
         int injectionDurationInMinutes = 30;
         int injectionsPerLinePerDay = (int) (MINUTES.between(dayStartTime, LocalTime.of(17, 0))
-                / injectionDurationInMinutes);
-
+        / injectionDurationInMinutes);
+        
         Random random = new Random(17);
         List<VaccineType> vaccineTypeList = List.of(VaccineType.values());
         List<PlanningVaccinationCenter> vaccinationCenterList = new ArrayList<>();
@@ -141,7 +85,7 @@ public class DemoDataGenerator {
         vaccinationCenterList.add(new PlanningVaccinationCenter("Beta center", pickLocation(random), 1));
         vaccinationCenterList.add(new PlanningVaccinationCenter("Gamma center", pickLocation(random), 1));
         int lineTotal = vaccinationCenterList.stream().mapToInt(PlanningVaccinationCenter::getLineCount).sum();
-
+        
         List<LocalDateTime> timeslotDateTimeList = new ArrayList<>(windowDaysLength * injectionsPerLinePerDay);
         for (int dayIndex = 0; dayIndex < windowDaysLength; dayIndex++) {
             LocalDate date = windowStartDate.plusDays(dayIndex);
@@ -150,14 +94,14 @@ public class DemoDataGenerator {
                 timeslotDateTimeList.add(LocalDateTime.of(date, time));
             }
         }
-
+        
         int personListSize = (lineTotal * injectionsPerLinePerDay * windowDaysLength) * 5 / 4; // 25% too many
         List<PlanningPerson> personList = new ArrayList<>(personListSize);
         long personId = 0L;
         for (int i = 0; i < personListSize; i++) {
             int lastNameI = i / PERSON_FIRST_NAMES.length;
             String name = PERSON_FIRST_NAMES[i % PERSON_FIRST_NAMES.length]
-                    + " " + (lastNameI < 26 ? ((char) ('A' + lastNameI)) + "." : lastNameI + 1);
+            + " " + (lastNameI < 26 ? ((char) ('A' + lastNameI)) + "." : lastNameI + 1);
             PlanningLocation location = pickLocation(random);
             LocalDate birthdate = MINIMUM_BIRTH_DATE.plusDays(random.nextInt(BIRTH_DATE_RANGE_LENGTH));
             int age = (int) YEARS.between(birthdate, windowStartDate);
@@ -167,13 +111,13 @@ public class DemoDataGenerator {
                 firstShotVaccineType = random.nextDouble() < 0.5 ? VaccineType.PFIZER : VaccineType.MODERNA;
             }
             LocalDate secondShotIdealDate = firstShotInjected ?
-                    windowStartDate.plusDays(random.nextInt(windowDaysLength))
-                    : null;
+            windowStartDate.plusDays(random.nextInt(windowDaysLength))
+            : null;
             PlanningPerson person = new PlanningPerson(Long.toString(personId++), name, location,
-                    birthdate, age, firstShotInjected, firstShotVaccineType, secondShotIdealDate);
+            birthdate, age, firstShotInjected, firstShotVaccineType, secondShotIdealDate);
             personList.add(person);
         }
-
+        
         List<Injection> injectionList = new ArrayList<>();
         long injectionId = 0L;
         for (PlanningVaccinationCenter vaccinationCenter : vaccinationCenterList) {
@@ -184,14 +128,34 @@ public class DemoDataGenerator {
                     for (int timeIndex = 0; timeIndex < injectionsPerLinePerDay; timeIndex++) {
                         LocalTime time = dayStartTime.plusMinutes(injectionDurationInMinutes * timeIndex);
                         injectionList.add(new Injection(
-                                injectionId++, vaccinationCenter, lineIndex,
-                                LocalDateTime.of(date, time), vaccineType));
+                            injectionId++, vaccinationCenter, lineIndex,
+                            LocalDateTime.of(date, time), vaccineType)
+                        );
                     }
+                    
                 }
             }
         }
-        VaccinationSchedule vSchedule = new VaccinationSchedule(vaccineTypeList, vaccinationCenterList, timeslotDateTimeList, personList, injectionList);
+        vSchedule = new VaccinationSchedule(vaccineTypeList, vaccinationCenterList, timeslotDateTimeList, personList, injectionList);
         return vSchedule;
+    }
+    
+
+    public VaccinationSchedule getVaccinationSchedule(){
+        return vSchedule;
+    }
+
+        
+    /*
+        Given a new VaccinationSchedule, post Appointments to FHIR Server
+    */
+    public void saveVaccinationSchedule(VaccinationSchedule vSchedule) {
+        // TO-DO:  Post to FHIR Server
+        this.vSchedule = vSchedule;
+    }
+    
+    public void handleException(Long l, Throwable t) {
+        log.error("Error during solver execution: "+t.getMessage());
     }
 
     public PlanningLocation pickLocation(Random random) {
