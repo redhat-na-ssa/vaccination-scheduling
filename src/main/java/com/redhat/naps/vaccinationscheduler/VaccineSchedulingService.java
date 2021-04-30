@@ -16,9 +16,10 @@
 
 package com.redhat.naps.vaccinationscheduler;
 
+import java.io.IOException;
+import java.io.InputStream;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.MINUTES;
-import static java.time.temporal.ChronoUnit.YEARS;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -31,6 +32,11 @@ import java.util.Random;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+
+import org.jboss.logging.Logger;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.redhat.naps.vaccinationscheduler.domain.Injection;
@@ -39,14 +45,20 @@ import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.domain.VaccinationSchedule;
 import com.redhat.naps.vaccinationscheduler.domain.VaccineType;
+import com.redhat.naps.vaccinationscheduler.mapping.FhirMapper;
 import com.redhat.naps.vaccinationscheduler.rest.FhirServerClient;
 
-import org.jboss.logging.Logger;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Patient;
+import ca.uhn.fhir.context.FhirContext;
 
 @ApplicationScoped
 public class VaccineSchedulingService {
 
     private static Logger log = Logger.getLogger(VaccineSchedulingService.class);
+    private static FhirContext fhirCtx = FhirContext.forR4();
 
     // Latitude and longitude window of the city of Atlanta, US.
     public static final double MINIMUM_LATITUDE = 33.40;
@@ -63,14 +75,17 @@ public class VaccineSchedulingService {
 
     @Inject
     @RestClient
-    FhirServerClient fclient;
+    FhirServerClient fhirClient;
+
+    @Inject
+    FhirMapper fhirMapper;
 
     private VaccinationSchedule vSchedule;
     
     /*
     TO-DO: Pull needed Resources from FHIR Server IOT create VaccinationSchedule object
     */
-    public VaccinationSchedule refreshVaccinationSchedule() {
+    public VaccinationSchedule refreshVaccinationSchedule() throws IOException {
         LocalDate windowStartDate = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY));
         int windowDaysLength = 5;
         LocalTime dayStartTime = LocalTime.of(9, 0);
@@ -80,10 +95,30 @@ public class VaccineSchedulingService {
         
         Random random = new Random(17);
         List<VaccineType> vaccineTypeList = List.of(VaccineType.values());
+
         List<PlanningVaccinationCenter> vaccinationCenterList = new ArrayList<>();
-        vaccinationCenterList.add(new PlanningVaccinationCenter("Alpha center", pickLocation(random), 3));
-        vaccinationCenterList.add(new PlanningVaccinationCenter("Beta center", pickLocation(random), 1));
-        vaccinationCenterList.add(new PlanningVaccinationCenter("Gamma center", pickLocation(random), 1));
+        Response gResponse = null;
+        try {
+            gResponse = fhirClient.getOrganizations();
+            String orgJson = IOUtils.toString((InputStream)gResponse.getEntity(), "UTF-8");
+            Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, orgJson);
+            List<BundleEntryComponent> becs = bObj.getEntry();
+            log.info("refreshVaccinationSchedule() # of Organizations = "+becs.size());
+            for(BundleEntryComponent bec : becs) {
+                Organization org = (Organization)bec.getResource();
+                PlanningVaccinationCenter pvc = fhirMapper.fromFhirOrganizationToPlanningVaccinationCenter(org);
+                vaccinationCenterList.add(pvc);
+            }
+
+        }catch(WebApplicationException x) {
+            gResponse = x.getResponse();
+            log.error("refreshVaccinationSchedule() error status = "+gResponse.getStatus()+"  when getting hospital from FhirServer");
+            log.error("refreshVaccinationSchedule() error meesage = "+IOUtils.toString((InputStream)gResponse.getEntity(), "UTF-8"));
+            throw x;
+        }finally {
+            gResponse.close();
+        }
+        
         int lineTotal = vaccinationCenterList.stream().mapToInt(PlanningVaccinationCenter::getLineCount).sum();
         
         List<LocalDateTime> timeslotDateTimeList = new ArrayList<>(windowDaysLength * injectionsPerLinePerDay);
@@ -97,25 +132,26 @@ public class VaccineSchedulingService {
         
         int personListSize = (lineTotal * injectionsPerLinePerDay * windowDaysLength) * 5 / 4; // 25% too many
         List<PlanningPerson> personList = new ArrayList<>(personListSize);
-        long personId = 0L;
-        for (int i = 0; i < personListSize; i++) {
-            int lastNameI = i / PERSON_FIRST_NAMES.length;
-            String name = PERSON_FIRST_NAMES[i % PERSON_FIRST_NAMES.length]
-            + " " + (lastNameI < 26 ? ((char) ('A' + lastNameI)) + "." : lastNameI + 1);
-            PlanningLocation location = pickLocation(random);
-            LocalDate birthdate = MINIMUM_BIRTH_DATE.plusDays(random.nextInt(BIRTH_DATE_RANGE_LENGTH));
-            int age = (int) YEARS.between(birthdate, windowStartDate);
-            boolean firstShotInjected = random.nextDouble() < 0.25;
-            VaccineType firstShotVaccineType = firstShotInjected ? pickVaccineType(random) : null;
-            if (firstShotInjected && age >= 55 && firstShotVaccineType == VaccineType.ASTRAZENECA) {
-                firstShotVaccineType = random.nextDouble() < 0.5 ? VaccineType.PFIZER : VaccineType.MODERNA;
+        Response pResponse = null;
+        try {
+            pResponse = fhirClient.getPatients();
+            String orgJson = IOUtils.toString((InputStream)pResponse.getEntity(), "UTF-8");
+            Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, orgJson);
+            List<BundleEntryComponent> becs = bObj.getEntry();
+            log.info("refreshVaccinationSchedule() # of Patients = "+becs.size());
+            for(BundleEntryComponent bec : becs) {
+                Patient org = (Patient)bec.getResource();
+                PlanningPerson pvc = fhirMapper.fromFhirPatientToPlanningPerson(org);
+                personList.add(pvc);
             }
-            LocalDate secondShotIdealDate = firstShotInjected ?
-            windowStartDate.plusDays(random.nextInt(windowDaysLength))
-            : null;
-            PlanningPerson person = new PlanningPerson(Long.toString(personId++), name, location,
-            birthdate, age, firstShotInjected, firstShotVaccineType, secondShotIdealDate);
-            personList.add(person);
+
+        }catch(WebApplicationException x) {
+            pResponse = x.getResponse();
+            log.error("refreshVaccinationSchedule() error status = "+pResponse.getStatus()+"  when getting patients from FhirServer");
+            log.error("refreshVaccinationSchedule() error meesage = "+IOUtils.toString((InputStream)pResponse.getEntity(), "UTF-8"));
+            throw x;
+        }finally{
+            pResponse.close();
         }
         
         List<Injection> injectionList = new ArrayList<>();

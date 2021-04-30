@@ -1,5 +1,6 @@
 package com.redhat.naps.vaccinationscheduler;
 
+import com.redhat.naps.vaccinationscheduler.domain.FhirServerAdminConfig;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,13 +12,16 @@ import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Priority;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.quarkus.runtime.StartupEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
@@ -43,6 +47,10 @@ public class FhirServerAdminResource {
     private static Logger log = Logger.getLogger(FhirServerAdminResource.class);
 
     @Inject
+    @ConfigProperty(name = FhirUtil.PATIENT_GENERATOR_COUNT, defaultValue = "1")
+    int patientGeneratorCount;
+
+    @Inject
     @ConfigProperty(name = FhirUtil.PATIENT_GENERATOR_STATE, defaultValue = "Michigan")
     String patientGeneratorState;
 
@@ -62,14 +70,22 @@ public class FhirServerAdminResource {
     }
     
     @POST
-    @Path("/seedFhirServer/{patientGeneratorCount}")
-    public Response seedFhirServer(@PathParam("patientGeneratorCount") int patientGeneratorCount) throws InterruptedException, IOException {
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/seedFhirServer/")
+    public Response seedFhirServer(final FhirServerAdminConfig adminConfig) throws InterruptedException, IOException {
+
+        if(adminConfig != null){
+            this.patientGeneratorCount = adminConfig.getPatientGeneratorCount();
+            if(StringUtils.isNotEmpty(adminConfig.getPatientGeneratorCity()))
+                this.patientGeneratorCity = adminConfig.getPatientGeneratorCity();
+            if(StringUtils.isNotEmpty(adminConfig.getPatientGeneratorState()))
+                this.patientGeneratorState = adminConfig.getPatientGeneratorState();
+        }
 
         // 1)  Define a directory on the filesystem where output files will be written to
         long randomSeed = ThreadLocalRandom.current().nextLong(100, 100000);
         String outputDir = this.patientGeneratorBaseDir+"/"+randomSeed+"/";
-        log.info("onStart() .... will generate the following # of patients: "+patientGeneratorCount+" to output dir = "+outputDir);
-
+        log.info("onStart() .... will generate the following # of patients: "+patientGeneratorCount+" to output dir = "+outputDir+" at the following location: "+patientGeneratorCity+" "+patientGeneratorState);
 
         // 2)  Control demographics of population
         Generator.GeneratorOptions options = new Generator.GeneratorOptions();

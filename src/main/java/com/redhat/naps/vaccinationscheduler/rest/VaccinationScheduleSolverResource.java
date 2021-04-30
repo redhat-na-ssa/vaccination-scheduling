@@ -16,6 +16,8 @@
 
 package com.redhat.naps.vaccinationscheduler.rest;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -71,10 +73,10 @@ public class VaccinationScheduleSolverResource {
 
     @POST
     @Path("/refreshVaccinationSchedule")
-    public Response refreshVaccinationSchedulingData() {
+    public Response refreshVaccinationSchedulingData() throws IOException {
 
-        VaccinationSchedule vSchedule = vaccinationScheduleService.refreshVaccinationSchedule();
-        return Response.ok(vSchedule.getPersonList().size()).build();
+            VaccinationSchedule vSchedule = vaccinationScheduleService.refreshVaccinationSchedule();
+            return Response.ok(vSchedule.getPersonList().size()).build();
     }
 
     @POST
