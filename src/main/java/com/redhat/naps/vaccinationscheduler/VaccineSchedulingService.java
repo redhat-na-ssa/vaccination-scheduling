@@ -126,6 +126,7 @@ public class VaccineSchedulingService {
 
 
         // TO-DO:  As per FIHR R4 Immunization.manufacturer,  maybe this should be implemented as a list of FHIR Organizations ?
+        // https://issues.redhat.com/browse/NAPSSS-87
         List<VaccineType> vaccineTypeList = List.of(VaccineType.values());
 
 
@@ -136,6 +137,8 @@ public class VaccineSchedulingService {
         int injectionDurationInMinutes = 30;
         int injectionsPerLinePerDay = (int) (MINUTES.between(dayStartTime, LocalTime.of(17, 0)) / injectionDurationInMinutes);
 
+
+        // TO-DO:  https://issues.redhat.com/browse/NAPSSS-84
         int lineTotal = vaccinationCenterList.stream().mapToInt(PlanningVaccinationCenter::getLineCount).sum();
         List<LocalDateTime> timeslotDateTimeList = new ArrayList<>(windowDaysLength * injectionsPerLinePerDay);
         for (int dayIndex = 0; dayIndex < windowDaysLength; dayIndex++) {
@@ -148,6 +151,7 @@ public class VaccineSchedulingService {
         
 
         // TO-DO:  What is the FHIR equivalent of injection supply at each vaccination center ?
+        // https://issues.redhat.com/browse/NAPSSS-86
         Random random = new Random(17);
         List<PlanningInjection> injectionList = new ArrayList<PlanningInjection>();
         long injectionId = 0L;

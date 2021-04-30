@@ -74,7 +74,7 @@ public class FhirMapper {
         PlanningLocation pLocation;
         List<Address> addresses = pObj.getAddress();
         if(addresses.size() > 0){
-            //TO-DO : Determine lat / long from Patient's Address
+            //TO-DO : Determine lat / long from Patient's Address   :  https://issues.redhat.com/browse/NAPSSS-83
             Address addressObj = pObj.getAddress().get(0);
             pLocation = new PlanningLocation(90.00, 135.00);
         }else{
@@ -103,7 +103,7 @@ public class FhirMapper {
         PlanningLocation pLocation;
         List<Address> addresses = pObj.getAddress();
         if(addresses.size() > 0){
-            //TO-DO : Determine lat / long from Patient's Address
+            //TO-DO : Determine lat / long from Patient's Address : https://issues.redhat.com/browse/NAPSSS-83
             Address addressObj = pObj.getAddress().get(0);
             pLocation = new PlanningLocation(90.00, 135.00);
         }else{

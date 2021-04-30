@@ -101,7 +101,6 @@ https://drive.google.com/drive/folders/17UHdSas1BE5gtwUcxaRroxmPyVWuYc_C?usp=sha
 
 . Red Hat Build of Quarkus
 . SmallRye
-. PostgreSQL
 . Optaplanner
 . Maven
 . Ansible
@@ -110,32 +109,10 @@ https://drive.google.com/drive/folders/17UHdSas1BE5gtwUcxaRroxmPyVWuYc_C?usp=sha
 . Swagger / OpenAPI
 . Podman
 . link:quay.io/redhat_naps_da/vaccination_scheduling[Quay]
+. HAPI FHIR
 
 
 == Local Dev Environment
-
-=== Postgresql 
-
-A Postgresql database is needed to support this vaccination scheduling application.
-
-. A local containerized postgresql can be instantiated as follows:
-+
------
-$ podman run -d \
-      --publish 5432:5432 \
-      --name psql_vaccine \
-      -e POSTGRESQL_USER=vaccine \
-      -e POSTGRESQL_PASSWORD=vaccine \
-      -e POSTGRESQL_DATABASE=vaccine \
-      -e POSTGRESQL_MAX_PREPARED_TRANSACTIONS=10 \
-      registry.redhat.io/rhel8/postgresql-12
------
-
-. Initialize the vaccine database of postgresql:
-+
------
-$ psql -h 127.0.0.1 -U vaccine -d vaccine -a -f src/main/resources/db/V1_appointment_table_create.sql
------
 
 === Run the application with live coding
 
@@ -150,7 +127,7 @@ or
 $  mvn clean package -DskipTests && java -jar target/vaccination-scheduler-1.0.0-runner.jar
 ----
 
-. Visit http://localhost:8080 in your browser.
+. Visit http://localhost:9090 in your browser.
 
 . Click on the *Solve* button.
 
@@ -165,9 +142,9 @@ Notice that those changes are immediately in effect.
 
 The vaccination scheduling application exposes RESTful APIs.
 
-The OpenAPI documentation pertaining to these RESTful APIs are available by navigating in a browser to: http://localhost:8080/q/swagger-ui/
+The OpenAPI documentation pertaining to these RESTful APIs are available by navigating in a browser to: http://localhost:9090/q/swagger-ui/
 
-The yaml representation of this OpenAPI documentation can be downloaded via:  http://localhost:8080/q/openapi
+The yaml representation of this OpenAPI documentation can be downloaded via:  http://localhost:9090/q/openapi
 
 To create 3scale _Active Docs_ from this OpenAPI, the JSON representation of the openapi documentation is needed.
 This JSON representation can be retrieved as follows:
@@ -184,13 +161,13 @@ This JSON representation can be retrieved as follows:
 +
 -----
 $ mvn clean package -DskipTests
-$ podman build -f docker/Dockerfile -t quay.io/redhat_naps_da/vaccination_scheduling:jbride-d506216dd-1 . 
+$ podman build -f docker/Dockerfile -t quay.io/redhat_naps_da/vaccination_scheduling:jbride-1c3940bb7c9-1 . 
 -----
 
 . push image
 +
 -----
-$ podman push quay.io/redhat_naps_da/vaccination_scheduling:jbride-363f9f4-3
+$ podman push quay.io/redhat_naps_da/vaccination_scheduling:jbride-1c3940bb7c9-1
 -----
 
 . Create IS
