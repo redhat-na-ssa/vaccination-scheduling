@@ -1,4 +1,4 @@
-package com.redhat.naps.vaccinationscheduler;
+package com.redhat.naps.vaccinationscheduler.rest;
 
 import com.redhat.naps.vaccinationscheduler.domain.FhirServerAdminConfig;
 import java.io.File;
@@ -46,6 +46,10 @@ public class FhirServerAdminResource {
     private static Logger log = Logger.getLogger(FhirServerAdminResource.class);
 
     @Inject
+    @ConfigProperty(name = FhirUtil.SEED_FHIR_SERVER_AT_STARTUP, defaultValue = "false")
+    boolean seedFhirServerAtStartup;
+
+    @Inject
     @ConfigProperty(name = FhirUtil.PATIENT_GENERATOR_COUNT, defaultValue = "1")
     int patientGeneratorCount;
 
@@ -65,7 +69,11 @@ public class FhirServerAdminResource {
     @RestClient
     FhirServerClient fhirClient;
 
-    public void onStart(@Observes @Priority(value = 1) StartupEvent ev) {
+    public void onStart(@Observes @Priority(value = 1) StartupEvent ev) throws InterruptedException, IOException {
+        if(seedFhirServerAtStartup) {
+            log.info("onStart() .... will seed FHIR Server");
+            seedFhirServer(null);
+        }
     }
     
     @POST

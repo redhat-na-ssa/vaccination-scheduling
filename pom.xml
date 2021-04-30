@@ -15,7 +15,6 @@
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
     <maven.compiler.release>11</maven.compiler.release>
     <surefire-plugin.version>2.22.2</surefire-plugin.version>
-    <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
     <hapi.fhir.version>5.3.0</hapi.fhir.version>
   </properties>
 
@@ -60,25 +59,13 @@
       <artifactId>quarkus-resteasy-jackson</artifactId>
     </dependency>
 
-    <!-- Hibernate ORM dependency -->
+    <!-- jackson unmarshalling  -->
     <dependency>
-    	<groupId>io.quarkus</groupId>
-    	<artifactId>quarkus-hibernate-orm-panache</artifactId>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>2.11.3</version>
     </dependency>
 
-    <!-- JDBC driver dependencies -->
-    <dependency>
-    	<groupId>io.quarkus</groupId>
-    	<artifactId>quarkus-jdbc-h2</artifactId>
-    </dependency>
-    <dependency>
-    	<groupId>io.quarkus</groupId>
-    	<artifactId>quarkus-flyway</artifactId>
-    </dependency>
-    <dependency>
-    	<groupId>io.quarkus</groupId>
-    	<artifactId>quarkus-test-h2</artifactId>
-    </dependency>
 
     <!-- Optaplanner -->
     <dependency>
@@ -90,26 +77,6 @@
       <artifactId>optaplanner-quarkus-jackson</artifactId>
     </dependency>
     
-    <!-- MapStruct bean mapper -->
-    <dependency>
-    	<groupId>org.mapstruct</groupId>
-    	<artifactId>mapstruct</artifactId>
-    	<version>${org.mapstruct.version}</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.mapstruct</groupId>
-    	<artifactId>mapstruct-processor</artifactId>
-    	<version>${org.mapstruct.version}</version>
-    	<scope>provided</scope>
-    </dependency>
-
-    <!-- jackson unmarshalling  -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>2.11.3</version>
-    </dependency>
-
     <!-- OCP Deployment -->
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -190,16 +157,7 @@
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${compiler-plugin.version}</version>
-<!--         <configuration>
-        	<nnotationProcessorPaths>
-        		<path>
-        			<groupId>org.mapstruct</groupId>
-        			<artifactId>mapstruct-processor</artifactId>
-        			<version>${org.masptruct.version}</version>
-        		</path>
-        	</nnotationProcessorPaths>
-        </configuration>
- -->      </plugin>
+      </plugin>
       <plugin>
         <groupId>io.quarkus</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>
