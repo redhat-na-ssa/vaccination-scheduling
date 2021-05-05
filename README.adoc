@@ -351,3 +351,15 @@ $ fhir-swagger \
     --r4 \
     --output target/fhir-server-swagger.json
 -----
+
+= Geocoding
+
+. Reference
+.. https://docs.mapbox.com/api/search/geocoding/#forward-geocoding
+.. https://docs.mapbox.com/help/troubleshooting/address-geocoding-format-guide/
+
+. Given a hospital address from FHIR test payload, call MapBox API to determine lat/lon (as per Forward Geocoding capability of MapBox)
++
+-----
+$ curl "https://api.mapbox.com/geocoding/v5/mapbox.places/6071%20W%20OUTER%20DRIVE%20DETROIT%20MI%2048235%20US.json?limit=1&access_token=$map_token" | jq .features[0].center
+-----

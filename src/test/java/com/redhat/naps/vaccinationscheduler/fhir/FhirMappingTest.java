@@ -92,7 +92,7 @@ public class FhirMappingTest {
         gResponse.close();
     }
 
-    @Disabled
+    //@Disabled
     @Test
     public void mapFhirPatientToPlanningPatientTest() throws IOException {
 
@@ -111,7 +111,10 @@ public class FhirMappingTest {
                 Patient pObj = (Patient)bec.getResource();
                 try {
                     PlanningPerson person = fhirMapper.fromFhirPatientToPlanningPerson(pObj);
+                    PlanningLocation pLocation = person.getHomeLocation();
                     assertTrue(pObj.getId().equals(person.getId()));
+                    assertTrue(pLocation.getLatitude() != 0.0);
+                    assertTrue(pLocation.getLongitude() != 0.0);
 
                 }catch(Throwable x){
                     x.printStackTrace();

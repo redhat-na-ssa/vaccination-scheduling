@@ -55,7 +55,7 @@ public class FhirServerTest {
     public void observationTest() throws IOException {
 
         // POST
-        String filePath = "/fhir/"+FhirUtil.OBSERVATION_INFORMATION+".json";
+        String filePath = "/fhir_bundles/"+FhirUtil.OBSERVATION_INFORMATION+".json";
         InputStream fStream = null;
         String oJson = null;
         try {
@@ -111,7 +111,7 @@ public class FhirServerTest {
     public void hospitalTest() throws IOException, InterruptedException {
 
         // POST
-        String filePath = "/fhir/"+FhirUtil.HOSPITAL_INFORMATION+".json";
+        String filePath = "/fhir_bundles/"+FhirUtil.HOSPITAL_INFORMATION+".json";
         InputStream fStream = null;
         String hospitalJson = null;
         try {
@@ -168,7 +168,7 @@ public class FhirServerTest {
     public void patientTest() throws IOException, InterruptedException {
 
         // POST
-        String filePath = "/fhir/"+FhirUtil.PATIENT_INFORMATION+".json";
+        String filePath = "/fhir_bundles/"+FhirUtil.PATIENT_INFORMATION+".json";
         InputStream fStream = null;
         String oJson = null;
         try {

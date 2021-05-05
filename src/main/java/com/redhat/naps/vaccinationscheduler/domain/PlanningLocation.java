@@ -28,7 +28,7 @@ public class PlanningLocation {
     // the following approximations are valid: 1° = 111 km (or 60 nautical miles) 0.1° = 11.1 km.
     public static final double METERS_PER_DEGREE = 111_000;
 
-    public final double latitude, longitude;
+    public double latitude, longitude;
     
     public PlanningLocation() {
         this.latitude=0.0;
@@ -44,6 +44,21 @@ public class PlanningLocation {
         double latitudeDiff = other.latitude - this.latitude;
         double longitudeDiff = other.longitude - this.longitude;
         return (long) ceil(sqrt(latitudeDiff * latitudeDiff + longitudeDiff * longitudeDiff) * METERS_PER_DEGREE);
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+    public void setLatitude(double x) {
+        latitude = x;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double x) {
+        longitude = x;
     }
 
     @Override

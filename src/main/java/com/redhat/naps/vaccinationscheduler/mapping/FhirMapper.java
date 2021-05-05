@@ -25,15 +25,20 @@ import org.hl7.fhir.exceptions.FHIRFormatError;
 import org.hl7.fhir.r4.model.codesystems.ServiceType;
 import org.hl7.fhir.r4.model.EnumFactory;
 import org.hl7.fhir.r4.model.Enumeration;
+import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.HealthcareService;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Property;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Slot;
+import org.hl7.fhir.r4.model.UriType;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Appointment;
+import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.DecimalType;
 
 import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningAppointment;
@@ -71,11 +76,14 @@ public class FhirMapper {
     public PlanningVaccinationCenter fromFhirOrganizationToPlanningVaccinationCenter(Organization pObj) {
         String name = pObj.getName();
 
+        //TO-DO : Determine lat / long from Patient's Address   :  https://issues.redhat.com/browse/NAPSSS-83
+
         PlanningLocation pLocation;
         List<Address> addresses = pObj.getAddress();
         if(addresses.size() > 0){
-            //TO-DO : Determine lat / long from Patient's Address   :  https://issues.redhat.com/browse/NAPSSS-83
+            
             Address addressObj = pObj.getAddress().get(0);
+
             pLocation = new PlanningLocation(90.00, 135.00);
         }else{
             log.warnv("{0}  fromFhirOrganizationToPlanningVaccinationCenter() No address from organization. Will set to North Pole", name);
@@ -100,12 +108,35 @@ public class FhirMapper {
         LocalDate lBirthDate = convertToLocalDate(birthDate);
         Period period = Period.between(lBirthDate, LocalDate.now());
 
-        PlanningLocation pLocation;
+        // Set PlanningLocation on PlanningPerson
+        PlanningLocation pLocation = new PlanningLocation();
         List<Address> addresses = pObj.getAddress();
         if(addresses.size() > 0){
-            //TO-DO : Determine lat / long from Patient's Address : https://issues.redhat.com/browse/NAPSSS-83
             Address addressObj = pObj.getAddress().get(0);
-            pLocation = new PlanningLocation(90.00, 135.00);
+            Extension eObj = addressObj.getExtensionByUrl(FhirUtil.PATIENT_ADDRESS_EXTENSION);
+            if(eObj != null) {
+                List<Extension> extensions = eObj.getExtension();
+                for(Extension extension: extensions){
+                    Property urlProp = extension.getNamedProperty(FhirUtil.URL);
+                    List<Base> urlPropValues = urlProp.getValues();
+                    UriType uri = (UriType) urlPropValues.get(0);
+                    Property vd = extension.getNamedProperty(FhirUtil.VALUE_DECIMAL);
+                    List<Base> vdPropValues = vd.getValues();
+                    DecimalType decimalV = (DecimalType) vdPropValues.get(0);
+                    //log.info(fullName+ "  fromFhirPatientToPlanningPerson() geolocation:  "+ uri.getValue() +" = "+decimalV.getValue() );
+                    if(uri.getValue().equals(FhirUtil.LATITUDE)) {
+                        double lat = decimalV.getValue().doubleValue();
+                        pLocation.setLatitude(lat);
+                    }
+                    else {
+                        double lon = decimalV.getValue().doubleValue();
+                        pLocation.setLongitude(lon);
+                    }
+                }
+            }else{
+                log.warnv("{0} fromFhirPatientToPlanningPerson() no geolocation address extension for patient. Will set to North Pole", fullName);
+                pLocation = new PlanningLocation(90.00, 135.00);
+            }
         }else{
             log.warnv("{0}  fromFhirPatientToPlanningPerson() No address from patient. Will set to North Pole", fullName);
             pLocation = new PlanningLocation(90.00, 135.00);

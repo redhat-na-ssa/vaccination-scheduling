@@ -19,5 +19,12 @@ public class FhirUtil {
     public static final String FIRST_DOSE_ADMINISTERED = "firstDoseAdministered";
 
     public static final String TEST_INTERACT_WITH_FHIRSERVER = "com.redhat.naps.vaccinationscheduler.test.interact_with_fhirserver";
+
+    public static final String PATIENT_ADDRESS_EXTENSION = "http://hl7.org/fhir/StructureDefinition/geolocation";
+
+    public static final String URL="url";
+    public static final String VALUE_DECIMAL="valueDecimal";
+    public static final String LONGITUDE="longitude";
+    public static final String LATITUDE="latitude";
     
 }

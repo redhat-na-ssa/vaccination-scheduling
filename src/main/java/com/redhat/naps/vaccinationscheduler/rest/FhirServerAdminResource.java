@@ -128,7 +128,11 @@ public class FhirServerAdminResource {
 
         return Response.ok(patientGeneratorCount).build();
     }
-    
+   
+    /*
+     * NOTE: this function currently only POSTs generated Patient data.
+     *       Generated Encounter data (associated with the Patient) is discarded
+     */ 
     private void seedPatients(int patientGeneratorCount, Exporter.ExporterRuntimeOptions ero) throws InterruptedException, IOException {
         int fhirRecordCount = 0;
         while(fhirRecordCount < patientGeneratorCount) {
