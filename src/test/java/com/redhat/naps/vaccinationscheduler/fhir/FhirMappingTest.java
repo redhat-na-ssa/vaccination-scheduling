@@ -27,12 +27,14 @@ import org.hl7.fhir.r4.model.Appointment;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Location;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 
 import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
+import com.redhat.naps.vaccinationscheduler.FhirServerAdminService;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningAppointment;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningInjection;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
@@ -58,6 +60,9 @@ public class FhirMappingTest {
     @RestClient
     FhirServerClient fhirClient;
 
+    @Inject
+    FhirServerAdminService fhirServerService;
+
     @Disabled
     @Test
     public void mapFhirOrganizationToPlanningVaccinationCenterTest() throws IOException {
@@ -74,10 +79,14 @@ public class FhirMappingTest {
             assertTrue(becs.size() > 0);
 
             for(BundleEntryComponent bec : becs){
-                Organization pObj = (Organization)bec.getResource();
+                Organization oObj = (Organization)bec.getResource();
                 try {
-                    PlanningVaccinationCenter pvc = fhirMapper.fromFhirOrganizationToPlanningVaccinationCenter(pObj);
-                    assertTrue(pObj.getName().equals(pvc.getName()));
+                    Location lObj = fhirServerService.getLocationFromOrganization(oObj);
+                    PlanningVaccinationCenter pvc = fhirMapper.fromFhirOrganizationToPlanningVaccinationCenter(oObj, lObj);
+                    assertTrue(oObj.getName().equals(pvc.getName()));
+                    PlanningLocation pLocation = pvc.getLocation();
+                    assertTrue(pLocation.getLatitude() != 0.0);
+                    assertTrue(pLocation.getLongitude() != 0.0);
 
                 }catch(Throwable x){
                     x.printStackTrace();
@@ -92,7 +101,7 @@ public class FhirMappingTest {
         gResponse.close();
     }
 
-    //@Disabled
+    @Disabled
     @Test
     public void mapFhirPatientToPlanningPatientTest() throws IOException {
 

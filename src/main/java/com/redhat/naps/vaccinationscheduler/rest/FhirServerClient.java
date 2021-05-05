@@ -3,7 +3,9 @@ package com.redhat.naps.vaccinationscheduler.rest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.Consumes;
 
@@ -52,6 +54,21 @@ public interface FhirServerClient {
     @Path("/Organization")
     @Consumes("application/fhir+json")
     Response postOrganization( String organizationJson);
+
+    @GET
+    @Path("/Location")
+    @Produces("application/fhir+json")
+    Response getLocations();
+
+    @GET
+    @Path("/Location")
+    @Produces("application/fhir+json")
+    Response getLocationbyName(@QueryParam("name") String urlEncodedName);
+
+    @POST
+    @Path("/Location")
+    @Consumes("application/fhir+json")
+    Response postLocation( String locationJson);
 
 
 

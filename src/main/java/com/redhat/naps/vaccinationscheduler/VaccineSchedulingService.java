@@ -18,7 +18,6 @@ package com.redhat.naps.vaccinationscheduler;
 
 import java.io.IOException;
 import java.io.InputStream;
-import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 import java.time.DayOfWeek;
@@ -40,7 +39,6 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.redhat.naps.vaccinationscheduler.domain.PlanningInjection;
-import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.domain.VaccinationSchedule;
@@ -48,9 +46,9 @@ import com.redhat.naps.vaccinationscheduler.domain.VaccineType;
 import com.redhat.naps.vaccinationscheduler.mapping.FhirMapper;
 import com.redhat.naps.vaccinationscheduler.rest.FhirServerClient;
 
-import org.hl7.fhir.exceptions.FHIRFormatError;
 import org.hl7.fhir.r4.model.Appointment;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Location;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Patient;
@@ -69,6 +67,9 @@ public class VaccineSchedulingService {
     @Inject
     FhirMapper fhirMapper;
 
+    @Inject
+    FhirServerAdminService fhirServerService;
+
     private VaccinationSchedule vSchedule;
     
     public VaccinationSchedule refreshVaccinationSchedule() throws IOException {
@@ -77,6 +78,8 @@ public class VaccineSchedulingService {
         List<PlanningVaccinationCenter> vaccinationCenterList = new ArrayList<>();
         Response gResponse = null;
         try {
+
+            // 1)  Pull all Organizations
             gResponse = fhirClient.getOrganizations();
             String orgJson = IOUtils.toString((InputStream)gResponse.getEntity(), "UTF-8");
             Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, orgJson);
@@ -84,7 +87,10 @@ public class VaccineSchedulingService {
             log.info("refreshVaccinationSchedule() # of Organizations = "+becs.size());
             for(BundleEntryComponent bec : becs) {
                 Organization org = (Organization)bec.getResource();
-                PlanningVaccinationCenter pvc = fhirMapper.fromFhirOrganizationToPlanningVaccinationCenter(org);
+
+                // 2)  For each Organization, grab corresponding Location
+                Location lObj = fhirServerService.getLocationFromOrganization(org);        
+                PlanningVaccinationCenter pvc = fhirMapper.fromFhirOrganizationToPlanningVaccinationCenter(org, lObj);
                 vaccinationCenterList.add(pvc);
             }
 

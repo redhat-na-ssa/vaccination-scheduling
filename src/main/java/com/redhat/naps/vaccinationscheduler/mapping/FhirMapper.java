@@ -1,7 +1,5 @@
 package com.redhat.naps.vaccinationscheduler.mapping;
 
-
-import com.redhat.naps.vaccinationscheduler.domain.PlanningInjection;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,18 +26,21 @@ import org.hl7.fhir.r4.model.Enumeration;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.HealthcareService;
 import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Location;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Property;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Slot;
 import org.hl7.fhir.r4.model.UriType;
+import org.hl7.fhir.r4.model.Location.LocationPositionComponent;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Appointment;
 import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.DecimalType;
 
+import com.redhat.naps.vaccinationscheduler.domain.PlanningInjection;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningAppointment;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
@@ -73,22 +74,10 @@ public class FhirMapper {
         return ldt;
     }
 
-    public PlanningVaccinationCenter fromFhirOrganizationToPlanningVaccinationCenter(Organization pObj) {
+    public PlanningVaccinationCenter fromFhirOrganizationToPlanningVaccinationCenter(Organization pObj, Location lObj) {
         String name = pObj.getName();
-
-        //TO-DO : Determine lat / long from Patient's Address   :  https://issues.redhat.com/browse/NAPSSS-83
-
-        PlanningLocation pLocation;
-        List<Address> addresses = pObj.getAddress();
-        if(addresses.size() > 0){
-            
-            Address addressObj = pObj.getAddress().get(0);
-
-            pLocation = new PlanningLocation(90.00, 135.00);
-        }else{
-            log.warnv("{0}  fromFhirOrganizationToPlanningVaccinationCenter() No address from organization. Will set to North Pole", name);
-            pLocation = new PlanningLocation(90.00, 135.00);
-        }
+        LocationPositionComponent lpObj = lObj.getPosition();
+        PlanningLocation pLocation = new PlanningLocation(lpObj.getLatitude().doubleValue(), lpObj.getLongitude().doubleValue());
         
         //TO-DO:  Investigate purpose of PlanningVaccinationCenter.lineCount
         PlanningVaccinationCenter pvc = new PlanningVaccinationCenter(name, pLocation, 1);
