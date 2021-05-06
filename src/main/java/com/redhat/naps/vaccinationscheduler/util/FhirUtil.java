@@ -3,6 +3,7 @@ package com.redhat.naps.vaccinationscheduler.util;
 public class FhirUtil {
 
     public static final String SEED_FHIR_SERVER_AT_STARTUP="com.redhat.naps.vaccinationscheduler.seed.fhir.server.at.startup";
+    public static final String HOSPITAL_GENERATOR_COUNT = "com.redhat.naps.vaccinationscheduler.hospitalGeneratorCount";
     public static final String PATIENT_GENERATOR_COUNT="com.redhat.naps.vaccinationscheduler.patientGeneratorCount";
     public static final String PATIENT_GENERATOR_STATE="com.redhat.naps.vaccinationscheduler.patientGeneratorState";
     public static final String PATIENT_GENERATOR_CITY="com.redhat.naps.vaccinationscheduler.patientGeneratorCity";

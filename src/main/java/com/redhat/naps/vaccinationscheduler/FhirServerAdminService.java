@@ -55,6 +55,10 @@ public class FhirServerAdminService {
     boolean seedFhirServerAtStartup;
 
     @Inject
+    @ConfigProperty(name = FhirUtil.HOSPITAL_GENERATOR_COUNT, defaultValue = "1")
+    int hospitalGeneratorCount;
+
+    @Inject
     @ConfigProperty(name = FhirUtil.PATIENT_GENERATOR_COUNT, defaultValue = "1")
     int patientGeneratorCount;
 
@@ -107,6 +111,7 @@ public class FhirServerAdminService {
     public int seedFhirServer(final FhirServerAdminConfig adminConfig) throws InterruptedException, IOException {
 
         if(adminConfig != null){
+            this.hospitalGeneratorCount = adminConfig.getHospitalGeneratorCount();
             this.patientGeneratorCount = adminConfig.getPatientGeneratorCount();
             if(StringUtils.isNotEmpty(adminConfig.getPatientGeneratorCity()))
                 this.patientGeneratorCity = adminConfig.getPatientGeneratorCity();
@@ -114,46 +119,55 @@ public class FhirServerAdminService {
                 this.patientGeneratorState = adminConfig.getPatientGeneratorState();
         }
 
-        // 1)  Define a directory on the filesystem where output files will be written to
-        long randomSeed = ThreadLocalRandom.current().nextLong(100, 100000);
-        String outputDir = this.patientGeneratorBaseDir+"/"+randomSeed+"/";
-        log.info("onStart() .... will generate the following # of patients: "+patientGeneratorCount+" to output dir = "+outputDir+" at the following location: "+patientGeneratorCity+" "+patientGeneratorState);
-
-        // 2)  Control demographics of population
+        
+        // 1)  Control demographics of population
         Generator.GeneratorOptions options = new Generator.GeneratorOptions();
         options.population = patientGeneratorCount;
         if(!patientGeneratorCity.equals(FhirUtil.OPTIONAL)){
             options.city = this.patientGeneratorCity;
         }
-        options.state = this.patientGeneratorState;
-        options.seed = randomSeed;
 
-        // 3)  Set Common Configuration options as per:  https://github.com/synthetichealth/synthea/wiki/Common-Configuration
-        Config.set("exporter.baseDirectory", outputDir);
+        // 2)  Set Common Configuration options as per:  https://github.com/synthetichealth/synthea/wiki/Common-Configuration
         Config.set("exporter.fhir.transaction_bundle", "true");
         Config.set("exporter.fhir.export", "true");
         Config.set("exporter.hospital.fhir.export", "true");
         Config.set("exporter.practitioner.fhir.export", "true");
         Config.set("generate.only_live_patients", "true");
-        Exporter.ExporterRuntimeOptions ero = new Exporter.ExporterRuntimeOptions();
-        ero.enableQueue(Exporter.SupportedFhirVersion.R4);
-        Generator generator = new Generator(options, ero);
-
-        // 4) Run the FHIR resource generator
-        ExecutorService generatorService = Executors.newFixedThreadPool(1);
-        generatorService.submit(() -> generator.run());
-
-        // 5)  Seed FHIR Server with patient resources
-        seedPatients(patientGeneratorCount, ero);
-
-        generatorService.shutdownNow();
         
-        Thread.sleep(5000);
-        
-        // 6) Seed FHIR Server with Hospital and Practitioner resources
-        seedHospitalAndPractitioners(outputDir);
+        // 3)  Loop by # of hospitals to generate
+        int totalPatientCount=0;
+        for(int c=0; c < hospitalGeneratorCount; c++) {
+
+            // 4)  Define a unique directory on the filesystem where output files will be written to
+            long randomSeed = ThreadLocalRandom.current().nextLong(100, 100000);
+            String outputDir = this.patientGeneratorBaseDir+"/"+randomSeed+"/";
+            options.state = this.patientGeneratorState;
+            options.seed = randomSeed;
+            Config.set("exporter.baseDirectory", outputDir);
+            log.info("onStart() .... will generate the following # of patients: "+patientGeneratorCount+" to output dir = "+outputDir+" at the following location: "+patientGeneratorCity+" "+patientGeneratorState);
+            
+            Exporter.ExporterRuntimeOptions ero = new Exporter.ExporterRuntimeOptions();
+            ero.enableQueue(Exporter.SupportedFhirVersion.R4);
+            Generator generator = new Generator(options, ero);
     
-        return patientGeneratorCount;
+            // 5) Run the FHIR resource generator
+            ExecutorService generatorService = Executors.newFixedThreadPool(1);
+            generatorService.submit(() -> generator.run());
+            
+            // 6)  Seed FHIR Server with patient resources
+            seedPatients(ero);
+            
+            generatorService.shutdownNow();
+            
+            Thread.sleep(5000);
+            
+            // 7) Seed FHIR Server with Hospital and Practitioner resources
+            seedHospitalAndPractitioners(outputDir);
+
+            totalPatientCount = totalPatientCount+patientGeneratorCount;
+        }
+        log.info("seedFhirServer() Total # of patients pushed to fhir server = "+totalPatientCount);
+        return totalPatientCount;
 
     }
    
@@ -161,7 +175,7 @@ public class FhirServerAdminService {
      * NOTE: this function currently only POSTs generated Patient data.
      *       Generated Encounter data (associated with the Patient) is discarded
      */ 
-    private void seedPatients(int patientGeneratorCount, Exporter.ExporterRuntimeOptions ero) throws InterruptedException, IOException {
+    private void seedPatients(Exporter.ExporterRuntimeOptions ero) throws InterruptedException, IOException {
         int fhirRecordCount = 0;
         while(fhirRecordCount < patientGeneratorCount) {
             String jsonRecord = ero.getNextRecord();
@@ -171,7 +185,7 @@ public class FhirServerAdminService {
             Response response = null;
             try {
                 response = fhirClient.postPatient(pJson);
-                log.infov("{0}    seedPatients() fhir server status code: {1}", pObj.getId(), response.getStatus());
+                log.infov("{0}    seedPatients() fhir server status code: {1}", pObj.getNameFirstRep().getFamily(), response.getStatus());
             }catch(WebApplicationException x){
                 response = x.getResponse();
                 log.error("seedPatients() error status = "+response.getStatus()+"  when posting the following Patient to the FhirServer: "+pObj.getId());
@@ -179,11 +193,8 @@ public class FhirServerAdminService {
             }
             response.close();
             fhirRecordCount++;
-            //log.info("\n\n\njsonRecord = "+jsonRecord);
-            log.info("record count = "+fhirRecordCount);
         }
               
-        log.info("seedPatients() Total # of fhir records = "+fhirRecordCount);
     }
     
     // FHIR resource generator outputs hospital and practitioner resources only to the filesystem
@@ -201,7 +212,7 @@ public class FhirServerAdminService {
                     log.info("found practitioner file: "+ file.getAbsolutePath());
                     seedPractitioner(file);
                 }else{
-                    log.info("skipping the following file: "+file.getAbsolutePath());
+                    log.trace("skipping the following file: "+file.getAbsolutePath());
                 }
             }
         }else {
@@ -227,7 +238,7 @@ public class FhirServerAdminService {
         Response response = null;
         try {
             response = fhirClient.postOrganization(pJson);
-            log.infov("{0}    seedHospital() fhir server status code: {1}", pObj.getId(), response.getStatus());
+            log.infov("{0}    seedHospital() fhir server status code: {1}", pObj.getName(), response.getStatus());
         }catch(WebApplicationException x){
             response = x.getResponse();
             log.error("seedHospital() error status = "+response.getStatus()+"  when posting the following Organization to the FhirServer: "+pObj.getId());
@@ -244,7 +255,7 @@ public class FhirServerAdminService {
         response = null;
         try {
             response = fhirClient.postLocation(lJson);
-            log.infov("{0}    seedHospital() fhir server status code when posting location: {1}", lObj.getId(), response.getStatus());
+            log.infov("{0}    seedHospital() fhir server status code when posting location: {1}", lObj.getName(), response.getStatus());
         }catch(WebApplicationException x){
             response = x.getResponse();
             log.error("seedHospital() error status = "+response.getStatus()+"  when posting the following Location to the FhirServer: "+lObj.getId());
