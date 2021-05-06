@@ -26,6 +26,7 @@ public class FhirUtil {
     public static final String VALUE_DECIMAL="valueDecimal";
     public static final String LONGITUDE="longitude";
     public static final String LATITUDE="latitude";
+    public static final String OPTIONAL="optional";
 
     public static final String SYNTHEA_SYSTEM_IDENTIFIER="https://github.com/synthetichealth/synthea";
     

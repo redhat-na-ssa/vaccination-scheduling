@@ -63,7 +63,7 @@ public class FhirServerAdminService {
     String patientGeneratorState;
 
     @Inject
-    @ConfigProperty(name = FhirUtil.PATIENT_GENERATOR_CITY, defaultValue = "Detroit")
+    @ConfigProperty(name = FhirUtil.PATIENT_GENERATOR_CITY, defaultValue = FhirUtil.OPTIONAL)
     String patientGeneratorCity;
 
     @Inject
@@ -121,7 +121,9 @@ public class FhirServerAdminService {
         // 2)  Control demographics of population
         Generator.GeneratorOptions options = new Generator.GeneratorOptions();
         options.population = patientGeneratorCount;
-        options.city = this.patientGeneratorCity;
+        if(!patientGeneratorCity.equals(FhirUtil.OPTIONAL)){
+            options.city = this.patientGeneratorCity;
+        }
         options.state = this.patientGeneratorState;
         options.seed = randomSeed;
 
