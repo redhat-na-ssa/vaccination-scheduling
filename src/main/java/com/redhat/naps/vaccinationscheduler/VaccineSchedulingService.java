@@ -220,7 +220,7 @@ public class VaccineSchedulingService {
                         Response response = null;
                         try {
                             String aJson = fhirCtx.newJsonParser().encodeResourceToString(aObj);
-                            response = fhirClient.postPatient(aJson);
+                            response = fhirClient.postAppointment(aJson);
                         }catch(WebApplicationException x){
                             response = x.getResponse();
                             log.error("saveVaccinationSchedule() error status = "+response.getStatus()+"  when posting Appointment to FhirServer: "+aObj.getId());
