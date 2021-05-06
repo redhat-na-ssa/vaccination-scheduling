@@ -141,6 +141,8 @@ public class FhirMapper {
         return person;
     }
     
+
+
     public  Appointment fromPlanningInjectionToFhirAppointment(PlanningInjection aObj) throws FHIRFormatError, IOException{
         
         Appointment fhirObj = new Appointment();
@@ -148,10 +150,6 @@ public class FhirMapper {
 
         // Id
         fhirObj.setId(Long.toString( aObj.getId() ));
-        
-        // Status
-        //String status = aObj.;
-        //fhirObj.setStatusElement(parseEnumeration(status, new Appointment.AppointmentStatusEnumFactory() ));
 
         // Patient
         String personName = aObj.getPerson().getName();
@@ -179,19 +177,29 @@ public class FhirMapper {
 
         // As text, specify whether this is the firstDoseAdministered
         immunizationConcept.setText(FhirUtil.FIRST_DOSE_ADMINISTERED +" : "+aObj.getPerson().isFirstShotInjected() );
+        LocalDate secondIdealDate = aObj.getPerson().getSecondShotIdealDate();
+        if(secondIdealDate != null){
+            immunizationConcept.setText(FhirUtil.SECOND_SHOT_IDEAL_DATE+" : "+fhirDateTimeFormatter.format(aObj.getPerson().getSecondShotIdealDate() ));
+        }
 
         Appointment.AppointmentParticipantComponent immunization = new Appointment.AppointmentParticipantComponent();
         immunization.setType(concepts);
         participants.add(immunization);
 
-        /* Start and End times;  ie:
-             start: 2013-12-09T09:00:00Z
-             end:   2013-12-09T11:00:00Z
-         */
+        // Time Slot
         LocalDateTime startTime = aObj.getDateTime();
+        Date startDate = convertToDate(startTime);
         LocalDateTime endTime = startTime.now().plusMinutes(timeSlotDurationMinutes);
-        fhirObj.setStart(convertToDate(startTime));
-        fhirObj.setEnd(convertToDate(endTime));
+        Date endDate = convertToDate(endTime);
+        fhirObj.setStart(startDate);
+        fhirObj.setEnd(endDate);
+        Slot slot = new Slot();
+        slot.setStart(startDate);
+        slot.setEnd(endDate);
+        fhirObj.addSlot(new Reference(slot));
+
+        // Status
+        //fhirObj.setStatusElement(parseEnumeration(status, new Appointment.AppointmentStatusEnumFactory() ));
     
         fhirObj.setParticipant(participants);
 

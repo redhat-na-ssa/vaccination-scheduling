@@ -208,6 +208,8 @@ public class VaccineSchedulingService {
     public void saveVaccinationSchedule(VaccinationSchedule vSchedule) {
 
         this.vSchedule = vSchedule;
+        log.info("saveVaccinationSchedule() solver status = "+vSchedule.getSolverStatus().name());
+
         
         if(this.vSchedule!=null && !this.vSchedule.getInjectionList().isEmpty()) {
             List<PlanningInjection> injections = vSchedule.getInjectionList();
@@ -233,6 +235,8 @@ public class VaccineSchedulingService {
                               response.close();
                         }
                         
+                    }else {
+                        throw new RuntimeException("saveVaccinationSchedule() unknown Injection "+i);
                     }
                 }
             }catch(Exception x) {
@@ -242,7 +246,7 @@ public class VaccineSchedulingService {
     }
     
     public void handleException(Long l, Throwable t) {
-        log.error("Error during solver execution: "+t.getMessage());
+        t.printStackTrace();
     }
 
 

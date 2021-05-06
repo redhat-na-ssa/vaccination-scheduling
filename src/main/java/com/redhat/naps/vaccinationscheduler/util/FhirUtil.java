@@ -18,6 +18,7 @@ public class FhirUtil {
     public static final String APPOINTMENT_INFORMATION = "appointmentInformation";
 
     public static final String FIRST_DOSE_ADMINISTERED = "firstDoseAdministered";
+    public static final String SECOND_SHOT_IDEAL_DATE = "secondShotIdealDate";
 
     public static final String TEST_INTERACT_WITH_FHIRSERVER = "com.redhat.naps.vaccinationscheduler.test.interact_with_fhirserver";
 
