@@ -154,6 +154,12 @@ $ git checkout v5.3.0
 +    driverClassName: org.postgresql.Driver
 -----
 
+. Start HAPI FHIR server
++
+-----
+$ mvn clean spring-boot:run -Pboot
+-----
+
 === Run the application with live coding
 
 . Start the application:
