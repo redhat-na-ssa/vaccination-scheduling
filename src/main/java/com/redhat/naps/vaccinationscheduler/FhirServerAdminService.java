@@ -99,7 +99,8 @@ public class FhirServerAdminService {
             log.error("getLocationFromOrg() error message = "+IOUtils.toString((InputStream)lResponse.getEntity(), "UTF-8"));
             throw x;
         }finally {
-            lResponse.close();
+            if(lResponse != null)
+                lResponse.close();
         }
     }
     
@@ -231,8 +232,10 @@ public class FhirServerAdminService {
             response = x.getResponse();
             log.error("seedHospital() error status = "+response.getStatus()+"  when posting the following Organization to the FhirServer: "+pObj.getId());
             log.error("seedHospital() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
+        }finally {
+            if(response != null)
+                response.close();
         }
-        response.close();
 
         // 3) POST corresponding Location
         List<BundleEntryComponent> becs = bObj.getEntry();
@@ -246,8 +249,10 @@ public class FhirServerAdminService {
             response = x.getResponse();
             log.error("seedHospital() error status = "+response.getStatus()+"  when posting the following Location to the FhirServer: "+lObj.getId());
             log.error("seedHospital() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
+        }finally {
+            if(response != null)
+                response.close();
         }
-        response.close();
 
     }
 
@@ -272,8 +277,10 @@ public class FhirServerAdminService {
             response = x.getResponse();
             log.error("seedPractitioner() error status = "+response.getStatus()+"  when posting the following Practitioner to the FhirServer: "+pObj.getId());
             log.error("seedPractitioner() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
+        }finally {
+            if(response != null)
+                response.close();
         }
-        response.close();
     }
 
 }

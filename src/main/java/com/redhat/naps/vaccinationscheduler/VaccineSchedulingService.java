@@ -102,7 +102,8 @@ public class VaccineSchedulingService {
                 log.error("refreshVaccinationSchedule() error meesage = "+IOUtils.toString((InputStream)gResponse.getEntity(), "UTF-8"));
                 throw x;
             }finally {
-                gResponse.close();
+                if(gResponse != null)
+                    gResponse.close();
             }
             
     
@@ -228,7 +229,8 @@ public class VaccineSchedulingService {
                             log.error("saveVaccinationSchedule() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
                             throw x;
                         }finally {
-                            response.close();
+                            if(response != null)
+                              response.close();
                         }
                         
                     }
