@@ -26,6 +26,7 @@ import org.hl7.fhir.r4.model.Enumeration;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.HealthcareService;
 import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Location;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
@@ -86,6 +87,11 @@ public class FhirMapper {
 
 
     public PlanningPerson fromFhirPatientToPlanningPerson(Patient pObj) {
+        String patientId = pObj.getIdElement().getIdPart();
+        /*List<Identifier> ids = pObj.getIdentifier();
+        for(Identifier id : ids) {
+            log.info("identifier = "+id.getSystemElement().asStringValue()+" : "+ id.getValue());
+        }*/
         HumanName name = pObj.getName().get(0);
         String fullName = name.getGivenAsSingleString()+" "+name.getFamily();
 
@@ -131,7 +137,7 @@ public class FhirMapper {
             pLocation = new PlanningLocation(90.00, 135.00);
         }
 
-        PlanningPerson person = new PlanningPerson(pObj.getId(), fullName, pLocation, lBirthDate, period.getYears());
+        PlanningPerson person = new PlanningPerson(patientId, fullName, pLocation, lBirthDate, period.getYears());
         return person;
     }
     
@@ -151,7 +157,7 @@ public class FhirMapper {
         String personName = aObj.getPerson().getName();
         Appointment.AppointmentParticipantComponent patient = new Appointment.AppointmentParticipantComponent();
         patient.setActor( new Reference( "Patient/"+aObj.getPerson().getId() ).setDisplay(personName) );
-        patient.setId(aObj.getPerson().getId() );
+        //patient.setId(aObj.getPerson().getId() );
         participants.add(patient);
         
         // Location

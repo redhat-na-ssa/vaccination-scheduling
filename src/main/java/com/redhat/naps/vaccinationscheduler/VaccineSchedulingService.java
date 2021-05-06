@@ -220,6 +220,7 @@ public class VaccineSchedulingService {
                         Response response = null;
                         try {
                             String aJson = fhirCtx.newJsonParser().encodeResourceToString(aObj);
+                            log.trace("appointment = \n\n"+aJson+"\n\n");
                             response = fhirClient.postAppointment(aJson);
                         }catch(WebApplicationException x){
                             response = x.getResponse();
