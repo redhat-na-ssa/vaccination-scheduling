@@ -109,9 +109,16 @@ https://drive.google.com/drive/folders/17UHdSas1BE5gtwUcxaRroxmPyVWuYc_C?usp=sha
 . Swagger / OpenAPI
 . Podman
 . link:quay.io/redhat_naps_da/vaccination_scheduling[Quay]
-. HAPI FHIR
+. HAPI FHIR link:https://github.com/hapifhir/org.hl7.fhir.core.git[Java Implementation] of link:https://www.hl7.org/fhir/resourcelist.html[HL7 FHIR R4] specification
+. link:https://github.com/hapifhir/hapi-fhir-jpaserver-starter[HAPI FHIR Server]
+. link:https://github.com/synthetichealth/synthea/wiki[Synthea Patient Generator]
 
 == Local Dev Environment
+
+A local development environment consists of the following:
+
+. A HAPI FHIR server
+. This application (which integrates with the HAPI FHIR server)
 
 === HAPI FHIR Server
 
@@ -160,18 +167,18 @@ $ git checkout v5.3.0
 $ mvn clean spring-boot:run -Pboot
 -----
 
-=== Run the application with live coding
+=== Vaccine Scheduling Quarkus Application
 
 . Start the application:
 +
 [source, shell]
 ----
-$ mvn quarkus:dev -Dquarkus.http.host=192.168.122.1
-
-or
-
 $  mvn clean package -DskipTests && java -jar target/vaccination-scheduler-1.0.0-runner.jar
 ----
++
+NOTE:  `mvn clean quarkus:dev` does not currently work with this application.
+The classpath is not set correctly and the src/main/resources/templates/ccda directly does not get loaded (needed for seeding FHIR R4 Patient data).
+TO-DO: Maybe something link:https://quarkus.io/guides/writing-native-applications-tips#including-resources[here] provides a hint.
 
 . Visit http://localhost:9090 in your browser.
 
@@ -396,16 +403,4 @@ $ fhir-swagger \
     --conformance_path="/metadata?_format=application/json" \
     --r4 \
     --output target/fhir-server-swagger.json
------
-
-= Geocoding
-
-. Reference
-.. https://docs.mapbox.com/api/search/geocoding/#forward-geocoding
-.. https://docs.mapbox.com/help/troubleshooting/address-geocoding-format-guide/
-
-. Given a hospital address from FHIR test payload, call MapBox API to determine lat/lon (as per Forward Geocoding capability of MapBox)
-+
------
-$ curl "https://api.mapbox.com/geocoding/v5/mapbox.places/6071%20W%20OUTER%20DRIVE%20DETROIT%20MI%2048235%20US.json?limit=1&access_token=$map_token" | jq .features[0].center
 -----
