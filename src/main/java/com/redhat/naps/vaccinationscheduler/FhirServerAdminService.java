@@ -3,6 +3,8 @@ package com.redhat.naps.vaccinationscheduler;
 import com.redhat.naps.vaccinationscheduler.domain.FhirServerAdminConfig;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -81,17 +83,21 @@ public class FhirServerAdminService {
         }
     }
 
+    // This function will return null if Organization doesn't exist
     public Location getLocationFromOrganization(Organization org) throws IOException {
         String orgName = org.getName();
         log.info("getLocationFromOrganization() orgName = "+orgName);
         Response lResponse = null;
         try {
-            lResponse = fhirClient.getLocationbyName(orgName);
+            lResponse = fhirClient.getLocationByOrgName(orgName);
             String lString = IOUtils.toString((InputStream)lResponse.getEntity(), "UTF-8");
             log.trace("getLocationFromOrganization() lString = \n\n"+lString+"\n\n");
             Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, lString );
-            Location lObj = (Location)bObj.getEntryFirstRep().getResource();
-            log.trace("getLocationFromOrganization() found Location with lat of: "+lObj.getPosition().getLatitude().doubleValue());
+            Location lObj = null;
+            if(bObj.getTotal() > 0) {
+                lObj = (Location)bObj.getEntryFirstRep().getResource();
+                log.trace("getLocationFromOrganization() found Location with lat of: "+lObj.getPosition().getLatitude().doubleValue());
+            }
             return lObj;
         }catch(WebApplicationException x){
             lResponse = x.getResponse();
@@ -149,53 +155,60 @@ public class FhirServerAdminService {
             // 5) Run the FHIR resource generator
             ExecutorService generatorService = Executors.newFixedThreadPool(1);
             generatorService.submit(() -> generator.run());
-            
-            // 6)  Seed FHIR Server with patient resources
-            seedPatients(ero);
-            
-            generatorService.shutdownNow();
-            
-            Thread.sleep(5000);
-            
-            // 7) Seed FHIR Server with Hospital and Practitioner resources
-            seedHospitalAndPractitioners(outputDir);
 
-            totalPatientCount = totalPatientCount+patientGeneratorCount;
+            // 6) Sleep for 5 seconds otherwise all files are not actually written to disk
+            Thread.sleep(5000);
+            generatorService.shutdownNow();
+
+            // 6) Determine whether this hospital already exists in the FHIR server
+            boolean hospitalAlreadyExistsInFhriServer = determineHospitalExistenceInFhirServer(outputDir);
+            if(!hospitalAlreadyExistsInFhriServer) {
+
+                // 7) Seed FHIR Server with Hospital and Practitioner resources
+                seedGeneratedResourcesToFhirServer(outputDir);
+    
+                totalPatientCount = totalPatientCount+patientGeneratorCount;
+            }
+            
         }
         log.info("seedFhirServer() Total # of patients pushed to fhir server = "+totalPatientCount);
         return totalPatientCount;
 
     }
-   
-    /*
-     * NOTE: this function currently only POSTs generated Patient data.
-     *       Generated Encounter data (associated with the Patient) is discarded
-     */ 
-    private void seedPatients(Exporter.ExporterRuntimeOptions ero) throws InterruptedException, IOException {
-        int fhirRecordCount = 0;
-        while(fhirRecordCount < patientGeneratorCount) {
-            String jsonRecord = ero.getNextRecord();
-            Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, jsonRecord);
-            Patient pObj = (Patient)bObj.getEntryFirstRep().getResource();
-            String pJson = fhirCtx.newJsonParser().encodeResourceToString(pObj);
-            Response response = null;
-            try {
-                response = fhirClient.postPatient(pJson);
-                log.infov("{0}    seedPatients() fhir server status code: {1}", pObj.getNameFirstRep().getFamily(), response.getStatus());
-            }catch(WebApplicationException x){
-                response = x.getResponse();
-                log.error("seedPatients() error status = "+response.getStatus()+"  when posting the following Patient to the FhirServer: "+pObj.getId());
-                log.error("seedPatients() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
-            }
-            response.close();
-            fhirRecordCount++;
+
+    private boolean determineHospitalExistenceInFhirServer(String outputDir) throws IOException {
+
+        FilenameFilter filter = (dir, name) -> name.startsWith(FhirUtil.HOSPITAL_INFORMATION);
+        File outputDirFile = new File(outputDir+"fhir");
+        File[] hospitalFiles = outputDirFile.listFiles(filter);
+        File hospitalFile = hospitalFiles[0];
+        
+        InputStream fStream = null;
+        String bundleString = null;
+        try {
+            fStream = new FileInputStream(hospitalFile);
+            bundleString = IOUtils.toString(fStream, "UTF-8");
+        }finally {
+            if(fStream != null)
+            fStream.close();
         }
-              
+        
+        Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, bundleString);
+        Organization hObj = (Organization)bObj.getEntryFirstRep().getResource();
+        Location hospital = this.getLocationFromOrganization(hObj);
+        if(hospital != null) {
+            log.warn("determineHospitalExistenceInFhirServer() The following hospital already exists in fhir server: "+hObj.getName());
+            return true;
+        } else
+            return false;
+
     }
+   
+
     
     // FHIR resource generator outputs hospital and practitioner resources only to the filesystem
     // Thus, this function reads those resources from the filesystem 
-    private void seedHospitalAndPractitioners(String outputDir) throws IOException {
+    private void seedGeneratedResourcesToFhirServer(String outputDir) throws IOException {
         File outputDirFile = new File(outputDir+"fhir");
         if(outputDirFile.exists()){
             File[] files = outputDirFile.listFiles();
@@ -208,7 +221,7 @@ public class FhirServerAdminService {
                     log.info("found practitioner file: "+ file.getAbsolutePath());
                     seedPractitioner(file);
                 }else{
-                    log.trace("skipping the following file: "+file.getAbsolutePath());
+                    seedPatient(file);
                 }
             }
         }else {
@@ -288,6 +301,35 @@ public class FhirServerAdminService {
             if(response != null)
                 response.close();
         }
+    }
+
+        /*
+     * NOTE: this function currently only POSTs generated Patient data.
+     *       Generated Encounter data (associated with the Patient) is discarded
+     */ 
+    private void seedPatient(File patientFile) throws IOException {
+        InputStream fStream = null;
+        String bundleString = null;
+        try {
+            fStream = new FileInputStream(patientFile);
+            bundleString = IOUtils.toString(fStream, "UTF-8");
+        }finally {
+            if(fStream != null)
+              fStream.close();
+        }
+        Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, bundleString);
+        Patient pObj = (Patient)bObj.getEntryFirstRep().getResource();
+        String pJson = fhirCtx.newJsonParser().encodeResourceToString(pObj);
+        Response response = null;
+        try {
+            response = fhirClient.postPatient(pJson);
+            log.infov("{0}    seedPatients() fhir server status code: {1}", pObj.getNameFirstRep().getFamily(), response.getStatus());
+        }catch(WebApplicationException x){
+            response = x.getResponse();
+            log.error("seedPatients() error status = "+response.getStatus()+"  when posting the following Patient to the FhirServer: "+pObj.getId());
+            log.error("seedPatients() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
+        }
+        response.close();    
     }
 
 }

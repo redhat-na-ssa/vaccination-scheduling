@@ -63,7 +63,7 @@ public interface FhirServerClient {
     @GET
     @Path("/Location")
     @Produces("application/fhir+json")
-    Response getLocationbyName(@QueryParam("name") String urlEncodedName);
+    Response getLocationByOrgName(@QueryParam("name") String orgName);
 
     @POST
     @Path("/Location")
