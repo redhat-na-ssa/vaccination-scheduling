@@ -53,6 +53,10 @@ public class FhirServerAdminService {
     boolean seedFhirServerAtStartup;
 
     @Inject
+    @ConfigProperty(name = FhirUtil.SLEEP_MILLIS_AFTER_FHIR_GENERATION, defaultValue = "5000")
+    int sleepMillisAfterFhirGeneration;
+
+    @Inject
     @ConfigProperty(name = FhirUtil.HOSPITAL_GENERATOR_COUNT, defaultValue = "1")
     int hospitalGeneratorCount;
 
@@ -157,14 +161,14 @@ public class FhirServerAdminService {
             generatorService.submit(() -> generator.run());
 
             // 6) Sleep for 5 seconds otherwise all files are not actually written to disk
-            Thread.sleep(5000);
+            Thread.sleep(sleepMillisAfterFhirGeneration);
             generatorService.shutdownNow();
 
-            // 6) Determine whether this hospital already exists in the FHIR server
+            // 7) Determine whether this hospital already exists in the FHIR server
             boolean hospitalAlreadyExistsInFhriServer = determineHospitalExistenceInFhirServer(outputDir);
             if(!hospitalAlreadyExistsInFhriServer) {
 
-                // 7) Seed FHIR Server with Hospital and Practitioner resources
+                // 8) Seed FHIR Server with Hospital and Practitioner resources
                 seedGeneratedResourcesToFhirServer(outputDir);
     
                 totalPatientCount = totalPatientCount+patientGeneratorCount;
