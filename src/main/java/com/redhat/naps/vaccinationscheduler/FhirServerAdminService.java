@@ -150,7 +150,6 @@ public class FhirServerAdminService {
             options.state = this.patientGeneratorState;
             options.seed = randomSeed;
             Config.set("exporter.baseDirectory", outputDir);
-            log.info("onStart() .... will generate the following # of patients: "+patientGeneratorCount+" to output dir = "+outputDir+" at the following location: "+patientGeneratorCity+" "+patientGeneratorState);
             
             Exporter.ExporterRuntimeOptions ero = new Exporter.ExporterRuntimeOptions();
             ero.enableQueue(Exporter.SupportedFhirVersion.R4);
@@ -160,9 +159,20 @@ public class FhirServerAdminService {
             ExecutorService generatorService = Executors.newFixedThreadPool(1);
             generatorService.submit(() -> generator.run());
 
+            /* 
+             *  5.5)  TO-DO:  Figure out why synthea needs all the patient generated data to be consumed before it will write hospital and patient data to disk
+             *                In the meantime, the following is a hack to enumerate through that patient data
+             */
+            int fhirRecordCount = 0;
+            while(fhirRecordCount < patientGeneratorCount) {
+                String notUsed = ero.getNextRecord();
+                fhirRecordCount++;
+            }
+            log.info("seedFhirServer() generated the following # of patients: "+patientGeneratorCount+" to output dir = "+outputDir+" at the following location: "+options.city+" "+patientGeneratorState+" .  Will sleep for the following millis: "+sleepMillisAfterFhirGeneration);
+
             // 6) Sleep for 5 seconds otherwise all files are not actually written to disk
-            Thread.sleep(sleepMillisAfterFhirGeneration);
             generatorService.shutdownNow();
+            Thread.sleep(sleepMillisAfterFhirGeneration);
 
             // 7) Determine whether this hospital already exists in the FHIR server
             boolean hospitalAlreadyExistsInFhriServer = determineHospitalExistenceInFhirServer(outputDir);
