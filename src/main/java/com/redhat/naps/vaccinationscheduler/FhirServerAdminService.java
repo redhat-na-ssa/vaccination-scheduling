@@ -181,6 +181,9 @@ public class FhirServerAdminService {
         FilenameFilter filter = (dir, name) -> name.startsWith(FhirUtil.HOSPITAL_INFORMATION);
         File outputDirFile = new File(outputDir+"fhir");
         File[] hospitalFiles = outputDirFile.listFiles(filter);
+        if(hospitalFiles == null || hospitalFiles.length == 0)
+            throw new RuntimeException("determineHospitalExistenceInFhirServer() No hospital files at the following directory: "+outputDir);
+
         File hospitalFile = hospitalFiles[0];
         
         InputStream fStream = null;
@@ -303,7 +306,7 @@ public class FhirServerAdminService {
         }
     }
 
-        /*
+    /*
      * NOTE: this function currently only POSTs generated Patient data.
      *       Generated Encounter data (associated with the Patient) is discarded
      */ 
