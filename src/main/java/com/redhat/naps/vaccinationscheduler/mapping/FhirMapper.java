@@ -75,8 +75,8 @@ public class FhirMapper {
         return ldt;
     }
 
-    public PlanningVaccinationCenter fromFhirOrganizationToPlanningVaccinationCenter(Organization pObj, Location lObj) {
-        String name = pObj.getName();
+    public PlanningVaccinationCenter fromFhirOrganizationToPlanningVaccinationCenter(Organization oObj, Location lObj) {
+        String name = oObj.getName();
         LocationPositionComponent lpObj = lObj.getPosition();
         PlanningLocation pLocation = new PlanningLocation(lpObj.getLatitude().doubleValue(), lpObj.getLongitude().doubleValue());
         

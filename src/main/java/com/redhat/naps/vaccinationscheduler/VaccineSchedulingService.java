@@ -91,9 +91,13 @@ public class VaccineSchedulingService {
                     Organization org = (Organization)bec.getResource();
     
                     // 2)  For each Organization, grab corresponding Location
-                    Location lObj = fhirServerService.getLocationFromOrganization(org);        
-                    PlanningVaccinationCenter pvc = fhirMapper.fromFhirOrganizationToPlanningVaccinationCenter(org, lObj);
-                    vaccinationCenterList.add(pvc);
+                    Location lObj = fhirServerService.getLocationFromOrganization(org);
+                    if(lObj != null) {
+                        PlanningVaccinationCenter pvc = fhirMapper.fromFhirOrganizationToPlanningVaccinationCenter(org, lObj);
+                        vaccinationCenterList.add(pvc);
+                    }else {
+                        log.warn("refreshVaccinationSchedule() will not consider the following hospital since it does not include a Location : "+org.getName());
+                    }
                 }
     
             }catch(WebApplicationException x) {

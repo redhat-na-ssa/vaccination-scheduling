@@ -159,6 +159,9 @@ $ git checkout v5.3.0
 +    username: admin
 +    password: admin
 +    driverClassName: org.postgresql.Driver
+
+-#    reuse_cached_search_results_millis: 60000
++    reuse_cached_search_results_millis: 5000
 -----
 
 . Start HAPI FHIR server

@@ -4,11 +4,14 @@ public class FhirUtil {
 
     public static final String SEED_FHIR_SERVER_AT_STARTUP="com.redhat.naps.vaccinationscheduler.seed.fhir.server.at.startup";
     public static final String SLEEP_MILLIS_AFTER_FHIR_GENERATION="com.redhat.naps.vaccinationscheduler.sleep.millis.after.fhir.generation";
+    public static final String SLEEP_MILLIS_AFTER_HOSPITAL_POST="com.redhat.naps.vaccinationscheduler.sleep.millis.after.hospital.post";
     public static final String HOSPITAL_GENERATOR_COUNT = "com.redhat.naps.vaccinationscheduler.hospitalGeneratorCount";
     public static final String PATIENT_GENERATOR_COUNT="com.redhat.naps.vaccinationscheduler.patientGeneratorCount";
     public static final String PATIENT_GENERATOR_STATE="com.redhat.naps.vaccinationscheduler.patientGeneratorState";
     public static final String PATIENT_GENERATOR_CITY="com.redhat.naps.vaccinationscheduler.patientGeneratorCity";
     public static final String PATIENT_GENERATOR_BASE_DIR="com.redhat.naps.vaccinationscheduler.patientGeneratorBaseDir";
+    public static final String PATIENT_GENERATOR_MIN_AGE="com.redhat.naps.vaccinationscheduler.patient.min.age";
+    public static final String PATIENT_GENERATOR_MAX_AGE="com.redhat.naps.vaccinationscheduler.patient.max.age";
     public static final String TIMESLOTDURATION_MINUTES="com.redhat.naps.vaccinationscheduler.timeslotduration.minutes";
 
     public static final String HOSPITAL_INFORMATION="hospitalInformation";
