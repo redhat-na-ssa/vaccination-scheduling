@@ -122,6 +122,7 @@ A local development environment consists of the following:
 
 === HAPI FHIR Server
 
+==== Database
 . Start Postgresql
 +
 -----
@@ -135,6 +136,15 @@ $ podman run -d \
       registry.redhat.io/rhel8/postgresql-12
 -----
 
+. This database can be cleared if needed by executing the following (using the psql utility at the command line):
++
+-----
+$    psql -h localhost -U admin r4 -c 'drop owned by admin'
+-----
++
+NOTE:  Be sure to stop the FHIR server (describe in the next section) before dropping the database tables
+
+==== FHIR Server
 . Clone HAPI Fhir Server source code and switch to version: v5.3.0
 +
 -----
