@@ -227,13 +227,13 @@ This JSON representation can be retrieved as follows:
 +
 -----
 $ mvn clean package -DskipTests
-$ podman build -f docker/Dockerfile -t quay.io/redhat_naps_da/vaccination_scheduling:jbride-1c3940bb7c9-1 . 
+$ podman build -f docker/Dockerfile -t quay.io/redhat_naps_da/vaccination_scheduling:jbride-df03d490719-1 . 
 -----
 
 . push image
 +
 -----
-$ podman push quay.io/redhat_naps_da/vaccination_scheduling:jbride-1c3940bb7c9-1
+$ podman push quay.io/redhat_naps_da/vaccination_scheduling:jbride-df03d490719-1
 -----
 
 . Create IS
@@ -382,6 +382,11 @@ image::doc/mapping_rules.png[]
 .. Domains & Access
 +
 Remove _Developer Portal Access Code_
+
+.. Configure _from_ email address when sending emails to Developers and invitations for Admin users
+
+... Access Admin Portal > Audience > Developer Portal > Domains & Access
+... Configure the field Outgoing Email with the desired email address
 
 .. Feature Visibility
 +
