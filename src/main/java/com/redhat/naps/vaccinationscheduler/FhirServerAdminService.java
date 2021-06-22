@@ -31,6 +31,7 @@ import org.hl7.fhir.r4.model.Location;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 
 import ca.uhn.fhir.context.FhirContext;
@@ -329,19 +330,43 @@ public class FhirServerAdminService {
               fStream.close();
         }
         Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, bundleString);
-        Practitioner pObj = (Practitioner)bObj.getEntryFirstRep().getResource();
-        String pJson = fhirCtx.newJsonParser().encodeResourceToString(pObj);
-        Response response = null;
-        try {
-            response = fhirClient.postPractitioner(pJson);
-            log.tracev("{0}    seedPractitioner() fhir server status code: {1}", pObj.getId(), response.getStatus());
-        }catch(WebApplicationException x){
-            response = x.getResponse();
-            log.error("seedPractitioner() error status = "+response.getStatus()+"  when posting the following Practitioner to the FhirServer: "+pObj.getId());
-            log.error("seedPractitioner() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
-        }finally {
-            if(response != null)
-                response.close();
+        List<BundleEntryComponent> becs = bObj.getEntry();
+        int counter = 2;
+        for(BundleEntryComponent bec : becs){
+            if(counter % 2 == 0) {
+                Practitioner pObj = (Practitioner)bec.getResource();
+                String pJson = fhirCtx.newJsonParser().encodeResourceToString(pObj);
+                Response response = null;
+                try {
+                    response = fhirClient.postPractitioner(pJson);
+                    log.tracev("{0}    seedPractitioner() fhir server status code: {1}", pObj.getId(), response.getStatus());
+                }catch(WebApplicationException x){
+                    response = x.getResponse();
+                    log.error("seedPractitioner() error status = "+response.getStatus()+"  when posting the following Practitioner to the FhirServer: "+pObj.getId());
+                    log.error("seedPractitioner() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
+                }finally {
+                    if(response != null)
+                        response.close();
+                }
+            }else {
+                PractitionerRole pObj = (PractitionerRole)bec.getResource();
+                String pJson = fhirCtx.newJsonParser().encodeResourceToString(pObj);
+                Response response = null;
+                try {
+                    response = fhirClient.postPractitionerRole(pJson);
+                    log.tracev("{0}    seedPractitionerRole() fhir server status code: {1}", pObj.getId(), response.getStatus());
+                }catch(WebApplicationException x){
+                    response = x.getResponse();
+                    log.error("seedPractitionerRole() error status = "+response.getStatus()+"  when posting the following PractitionerRole to the FhirServer: "+pObj.getId());
+                    log.error("seedPractitionerRole() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
+                }finally {
+                    if(response != null)
+                        response.close();
+                }
+
+            }
+            counter++;
+
         }
     }
 

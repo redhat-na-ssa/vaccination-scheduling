@@ -41,6 +41,11 @@ public interface FhirServerClient {
     @Consumes("application/fhir+json")
     Response postPractitioner( String practitionerJson);
 
+    @POST
+    @Path("/PractitionerRole")
+    @Consumes("application/fhir+json")
+    Response postPractitionerRole(String practiionerRoleJson);
+
 
 
 

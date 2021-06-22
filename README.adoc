@@ -129,9 +129,9 @@ A local development environment consists of the following:
 $ podman run -d \
       --publish 5432:5432 \
       --name fhir \
-      -e POSTGRESQL_USER=admin \
-      -e POSTGRESQL_PASSWORD=admin \
-      -e POSTGRESQL_DATABASE=r4 \
+      -e POSTGRESQL_USER=fhir \
+      -e POSTGRESQL_PASSWORD=fhir \
+      -e POSTGRESQL_DATABASE=fhir \
       -e POSTGRESQL_MAX_PREPARED_TRANSACTIONS=10 \
       registry.redhat.io/rhel8/postgresql-12
 -----
@@ -165,9 +165,9 @@ $ git checkout v5.3.0
 -    username: sa
 -    password: null
 -    driverClassName: org.h2.Driver
-+    url: 'jdbc:postgresql://localhost:5432/r4'
-+    username: admin
-+    password: admin
++    url: 'jdbc:postgresql://localhost:5432/fhir'
++    username: fhir
++    password: fhir
 +    driverClassName: org.postgresql.Driver
 
 -#    reuse_cached_search_results_millis: 60000
