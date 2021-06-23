@@ -51,6 +51,7 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Location;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Patient;
 import ca.uhn.fhir.context.FhirContext;
 
@@ -76,7 +77,7 @@ public class VaccineSchedulingService {
 
         synchronized(fhirClient) {
 
-            // Retrieve all evacuation center data from FHIR Server
+            // Retrieve all vaccination center data from FHIR Server
             List<PlanningVaccinationCenter> vaccinationCenterList = new ArrayList<>();
             Response gResponse = null;
             try {
@@ -109,13 +110,41 @@ public class VaccineSchedulingService {
                 if(gResponse != null)
                     gResponse.close();
             }
-            
-    
-            
-    
-            // Retrieve all patients from FHIR server
-            List<PlanningPerson> personList = new ArrayList<>();
+
+
+            // 2 Retrieve all PractionerRole resources from FHIR server
+
+            // TO-DO: define a data object equivalent to FHIR PractitionerRole
+            List<?> pRoleList = new ArrayList<>();  
             Response pResponse = null;
+            try {
+                pResponse = fhirClient.getPractionerRoles();
+                String orgJson = IOUtils.toString((InputStream)pResponse.getEntity(), "UTF-8");
+                Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, orgJson);
+                List<BundleEntryComponent> becs = bObj.getEntry();
+                log.info("refreshVaccinationSchedule() # of PractionerRole resources = "+becs.size());
+                for(BundleEntryComponent bec : becs) {
+                    PractitionerRole pRole = (PractitionerRole)bec.getResource();
+
+                    // TO-DO:  Map to an equivalent data object
+                    //pRoleList.add(nurse);
+
+                }
+    
+            }catch(WebApplicationException x) {
+                pResponse = x.getResponse();
+                log.error("refreshVaccinationSchedule() error status = "+pResponse.getStatus()+"  when getting practitioner roles from FhirServer");
+                log.error("refreshVaccinationSchedule() error meesage = "+IOUtils.toString((InputStream)pResponse.getEntity(), "UTF-8"));
+                throw x;
+            }finally{
+                pResponse.close();
+            }
+    
+            
+    
+            // 3) Retrieve all patients from FHIR server
+            List<PlanningPerson> personList = new ArrayList<>();
+            pResponse = null;
             try {
                 pResponse = fhirClient.getPatients();
                 String orgJson = IOUtils.toString((InputStream)pResponse.getEntity(), "UTF-8");

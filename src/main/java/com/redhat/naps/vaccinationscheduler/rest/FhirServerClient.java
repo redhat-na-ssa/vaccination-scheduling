@@ -46,6 +46,11 @@ public interface FhirServerClient {
     @Consumes("application/fhir+json")
     Response postPractitionerRole(String practiionerRoleJson);
 
+    @GET
+    @Path("/PractitionerRole")
+    @Produces("application/fhir+json")
+    Response getPractionerRoles();
+
 
 
 
@@ -123,5 +128,7 @@ public interface FhirServerClient {
     @Path("/Observation")
     @Consumes("application/fhir+json")
     Response postObservation( String observationJson);
+
+
     
 }
