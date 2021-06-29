@@ -26,10 +26,11 @@ import org.hl7.fhir.r4.model.Enumeration;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.HealthcareService;
 import org.hl7.fhir.r4.model.HumanName;
-import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Location;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
+import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Property;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Slot;
@@ -43,9 +44,10 @@ import org.hl7.fhir.r4.model.DecimalType;
 
 import com.redhat.naps.vaccinationscheduler.domain.PlanningInjection;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
-import com.redhat.naps.vaccinationscheduler.domain.PlanningAppointment;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningLocation;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningPractitioner;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningPractitionerRole;
 import com.redhat.naps.vaccinationscheduler.util.FhirUtil;
 
 @ApplicationScoped
@@ -68,20 +70,38 @@ public class FhirMapper {
     @Inject
     @ConfigProperty(name = FhirUtil.TIMESLOTDURATION_MINUTES, defaultValue = "30")
     int timeSlotDurationMinutes;
-
+    
     public LocalDateTime fromFhirSlotToPlanningSlot(Slot fhirSlot){
 
         LocalDateTime ldt = convertToLocalDateTime(fhirSlot.getStart());
         return ldt;
     }
 
-    public PlanningVaccinationCenter fromFhirOrganizationToPlanningVaccinationCenter(Organization oObj, Location lObj) {
-        String name = oObj.getName();
+    public PlanningPractitioner fromFhirPractitionerToPlanningPractitioner(Practitioner pObj) {
+    	String name = (pObj.getName()==null || pObj.getName().isEmpty())?"":pObj.getName().get(0).getFamily();
+    	PlanningPractitioner pPrac = new PlanningPractitioner(name);
+    	
+    	return pPrac;
+    }
+
+	public PlanningPractitionerRole fromFhirPractitionerRoleToPlanningPractitionerRole(PractitionerRole pr) {
+		PlanningPractitionerRole pRole = new PlanningPractitionerRole();
+
+		pRole.setPractitionerId(pr.getPractitioner().getId());
+		pRole.setPractitionerName(pr.getPractitioner().getDisplay());
+		pRole.setVaccinationCenterId(pr.getOrganization().getId());
+		pRole.setVaccinationCenterName(pr.getOrganization().getDisplay());
+		return pRole;
+	}
+
+    public PlanningVaccinationCenter fromFhirOrganizationToPlanningVaccinationCenter(Organization pObj, Location lObj) {
+    	String id = pObj.getId();
+        String name = pObj.getName();
         LocationPositionComponent lpObj = lObj.getPosition();
         PlanningLocation pLocation = new PlanningLocation(lpObj.getLatitude().doubleValue(), lpObj.getLongitude().doubleValue());
         
         //TO-DO:  Investigate purpose of PlanningVaccinationCenter.lineCount
-        PlanningVaccinationCenter pvc = new PlanningVaccinationCenter(name, pLocation, 1);
+        PlanningVaccinationCenter pvc = new PlanningVaccinationCenter(id, name, pLocation, 1);
         return pvc;
     }
 
@@ -225,6 +245,5 @@ public class FhirMapper {
     private LocalDateTime convertToLocalDateTime(Date dObj) {
         return dObj.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
-
 
 }

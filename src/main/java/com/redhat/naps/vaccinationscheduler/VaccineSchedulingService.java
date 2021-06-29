@@ -36,10 +36,15 @@ import javax.ws.rs.core.Response;
 
 import org.jboss.logging.Logger;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import com.github.javaparser.utils.Log;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningInjection;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningPractitioner;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningPractitionerRole;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.domain.VaccinationSchedule;
 import com.redhat.naps.vaccinationscheduler.domain.VaccineType;
@@ -53,6 +58,8 @@ import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.PractitionerRole;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Practitioner;
+
 import ca.uhn.fhir.context.FhirContext;
 
 @ApplicationScoped
@@ -90,7 +97,9 @@ public class VaccineSchedulingService {
                 log.info("refreshVaccinationSchedule() # of Organizations = "+becs.size());
                 for(BundleEntryComponent bec : becs) {
                     Organization org = (Organization)bec.getResource();
-    
+                    
+                    log.info("!!!!! Organization identifier: "+org.getIdentifier());
+                    
                     // 2)  For each Organization, grab corresponding Location
                     Location lObj = fhirServerService.getLocationFromOrganization(org);
                     if(lObj != null) {
@@ -113,9 +122,7 @@ public class VaccineSchedulingService {
 
 
             // 2 Retrieve all PractionerRole resources from FHIR server
-
-            // TO-DO: define a data object equivalent to FHIR PractitionerRole
-            List<?> pRoleList = new ArrayList<>();  
+            List<PlanningPractitionerRole> pRoleList = new ArrayList<>();  
             Response pResponse = null;
             try {
                 pResponse = fhirClient.getPractionerRoles();
@@ -125,9 +132,13 @@ public class VaccineSchedulingService {
                 log.info("refreshVaccinationSchedule() # of PractionerRole resources = "+becs.size());
                 for(BundleEntryComponent bec : becs) {
                     PractitionerRole pRole = (PractitionerRole)bec.getResource();
-
-                    // TO-DO:  Map to an equivalent data object
-                    //pRoleList.add(nurse);
+                    //log.info("Practitioner role: "+ToStringBuilder.reflectionToString(pRole)+"\n");
+                    //log.info("***** Practitioner Role Practitioner: "+ToStringBuilder.reflectionToString(pRole.getPractitioner())+"\n");
+                    //log.info("##### Practitioner Role Organization: "+ToStringBuilder.reflectionToString(pRole.getOrganization())+"\n");
+                    log.info("$$$$$ Organization Identifier: "+ToStringBuilder.reflectionToString(pRole.getOrganization().getIdentifier().getValue()+"\n"));
+            		PlanningPractitionerRole role = fhirMapper.fromFhirPractitionerRoleToPlanningPractitionerRole(pRole);
+            		//log.info("&&&&& Planning Practitioner Role: "+ToStringBuilder.reflectionToString(role));
+                    pRoleList.add(role);
 
                 }
     
@@ -165,7 +176,33 @@ public class VaccineSchedulingService {
             }finally{
                 pResponse.close();
             }
-    
+            
+            // Retrieve all practitioners from FHIR server
+            List<PlanningPractitioner> practitionerList = new ArrayList<>();
+            Response prResponse = null;
+            try {
+                prResponse = fhirClient.getPractitioners();
+                String prJson = IOUtils.toString((InputStream)prResponse.getEntity(), "UTF-8");
+                Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, prJson);
+                List<BundleEntryComponent> becs = bObj.getEntry();
+                log.info("refreshVaccinationSchedule() # of Practitioners = "+becs.size());
+                for(BundleEntryComponent bec : becs) {
+                	Practitioner pr = (Practitioner)bec.getResource();
+                	//log.info("Practitioner info: named property: "+pr.getNamedProperty("AU MEDICAL CENTER").getName());
+                    log.info("Practitioner identifier: "+pr.getId()+" identifier: "+pr.getIdentifier());
+                	PlanningPractitioner ppr = fhirMapper.fromFhirPractitionerToPlanningPractitioner(pr);
+                	practitionerList.add(ppr);
+                }
+
+            }catch(WebApplicationException x) {
+                prResponse = x.getResponse();
+                log.error("refreshVaccinationSchedule() error status = "+prResponse.getStatus()+"  when getting practitioners from FhirServer");
+                log.error("refreshVaccinationSchedule() error meesage = "+IOUtils.toString((InputStream)prResponse.getEntity(), "UTF-8"));
+                throw x;
+            }finally{
+                prResponse.close();
+            }
+            
     
             // TO-DO:  As per FIHR R4 Immunization.manufacturer,  maybe this should be implemented as a list of FHIR Organizations ?
             // https://issues.redhat.com/browse/NAPSSS-87
@@ -204,10 +241,16 @@ public class VaccineSchedulingService {
                         VaccineType vaccineType = pickVaccineType(random);
                         for (int timeIndex = 0; timeIndex < injectionsPerLinePerDay; timeIndex++) {
                             LocalTime time = dayStartTime.plusMinutes(injectionDurationInMinutes * timeIndex);
-                            injectionList.add(new PlanningInjection(
-                                injectionId++, vaccinationCenter, lineIndex,
-                                LocalDateTime.of(date, time), vaccineType)
-                            );
+                            for(PlanningPractitionerRole ppr : pRoleList) {
+                            	String planningId = ppr.getVaccinationCenterId();
+                            	String fhirId = vaccinationCenter.getId();
+                            	//log.info("planningId: "+planningId+" fhirId : "+fhirId);
+                            	if(StringUtils.equals(planningId, fhirId)) {
+		                            injectionList.add(new PlanningInjection(
+		                                injectionId++, vaccinationCenter, lineIndex,
+		                                LocalDateTime.of(date, time), vaccineType));
+                            	}
+                            }
                         }
                         
                     }

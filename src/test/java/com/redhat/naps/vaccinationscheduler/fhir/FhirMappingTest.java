@@ -193,7 +193,7 @@ public class FhirMappingTest {
     private PlanningInjection createSamplePlanningInjection(String patientId, String patientName) {
 
         PlanningPerson person = new PlanningPerson(patientId, patientName, null, LocalDate.now(), 77, false, VaccineType.MODERNA, LocalDate.now());
-        PlanningVaccinationCenter pvc = new PlanningVaccinationCenter("CHANGEME", new PlanningLocation(90.00, 135.00), 1);
+        PlanningVaccinationCenter pvc = new PlanningVaccinationCenter("1","CHANGEME", new PlanningLocation(90.00, 135.00), 1);
         PlanningInjection pInjection = new PlanningInjection(1001L, pvc, 1, LocalDateTime.now(), VaccineType.MODERNA, person);
         return pInjection;
     }

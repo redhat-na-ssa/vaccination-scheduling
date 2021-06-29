@@ -31,7 +31,7 @@ import org.optaplanner.test.api.score.stream.ConstraintVerifier;
 
 class VaccinationScheduleConstraintProviderTest {
 
-    private static final PlanningVaccinationCenter VACCINATION_CENTER_1 = new PlanningVaccinationCenter("Alpha", new PlanningLocation(0, 0), 3);
+    private static final PlanningVaccinationCenter VACCINATION_CENTER_1 = new PlanningVaccinationCenter("1", "Alpha", new PlanningLocation(0, 0), 3);
     private static final LocalDate MONDAY = LocalDate.of(2021, 2, 1);
     private static final LocalDate TUESDAY = LocalDate.of(2021, 2, 2);
     private static final LocalDate WEDNESDAY = LocalDate.of(2021, 2, 3);

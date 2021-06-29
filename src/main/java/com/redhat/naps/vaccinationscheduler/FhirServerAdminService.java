@@ -333,8 +333,10 @@ public class FhirServerAdminService {
         List<BundleEntryComponent> becs = bObj.getEntry();
         int counter = 2;
         for(BundleEntryComponent bec : becs){
+        	Practitioner pObj = null;
+        	PractitionerRole prObj = null;
             if(counter % 2 == 0) {
-                Practitioner pObj = (Practitioner)bec.getResource();
+                pObj = (Practitioner)bec.getResource();
                 String pJson = fhirCtx.newJsonParser().encodeResourceToString(pObj);
                 Response response = null;
                 try {
@@ -349,15 +351,15 @@ public class FhirServerAdminService {
                         response.close();
                 }
             }else {
-                PractitionerRole pObj = (PractitionerRole)bec.getResource();
-                String pJson = fhirCtx.newJsonParser().encodeResourceToString(pObj);
+                prObj = (PractitionerRole)bec.getResource();
+                String pJson = fhirCtx.newJsonParser().encodeResourceToString(prObj);
                 Response response = null;
                 try {
                     response = fhirClient.postPractitionerRole(pJson);
-                    log.tracev("{0}    seedPractitionerRole() fhir server status code: {1}", pObj.getId(), response.getStatus());
+                    log.tracev("{0}    seedPractitionerRole() fhir server status code: {1}", prObj.getId(), response.getStatus());
                 }catch(WebApplicationException x){
                     response = x.getResponse();
-                    log.error("seedPractitionerRole() error status = "+response.getStatus()+"  when posting the following PractitionerRole to the FhirServer: "+pObj.getId());
+                    log.error("seedPractitionerRole() error status = "+response.getStatus()+"  when posting the following PractitionerRole to the FhirServer: "+prObj.getId());
                     log.error("seedPractitionerRole() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
                 }finally {
                     if(response != null)
