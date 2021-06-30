@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -98,7 +99,8 @@ public class VaccineSchedulingService {
                 for(BundleEntryComponent bec : becs) {
                     Organization org = (Organization)bec.getResource();
                     
-                    log.info("!!!!! Organization identifier: "+org.getIdentifier());
+                    if(log.isDebugEnabled())
+                    	log.debug("!!!!! Organization name: "+org.getName()+" identifier: "+org.getIdentifier().get(0).getValue());
                     
                     // 2)  For each Organization, grab corresponding Location
                     Location lObj = fhirServerService.getLocationFromOrganization(org);
@@ -106,7 +108,8 @@ public class VaccineSchedulingService {
                         PlanningVaccinationCenter pvc = fhirMapper.fromFhirOrganizationToPlanningVaccinationCenter(org, lObj);
                         vaccinationCenterList.add(pvc);
                     }else {
-                        log.warn("refreshVaccinationSchedule() will not consider the following hospital since it does not include a Location : "+org.getName());
+                        log.warn("refreshVaccinationSchedule() will not consider the following hospital since it does not include a Location : "
+                        		+org.getName());
                     }
                 }
     
@@ -132,12 +135,16 @@ public class VaccineSchedulingService {
                 log.info("refreshVaccinationSchedule() # of PractionerRole resources = "+becs.size());
                 for(BundleEntryComponent bec : becs) {
                     PractitionerRole pRole = (PractitionerRole)bec.getResource();
-                    //log.info("Practitioner role: "+ToStringBuilder.reflectionToString(pRole)+"\n");
-                    //log.info("***** Practitioner Role Practitioner: "+ToStringBuilder.reflectionToString(pRole.getPractitioner())+"\n");
-                    //log.info("##### Practitioner Role Organization: "+ToStringBuilder.reflectionToString(pRole.getOrganization())+"\n");
-                    log.info("$$$$$ Organization Identifier: "+ToStringBuilder.reflectionToString(pRole.getOrganization().getIdentifier().getValue()+"\n"));
+                    if(log.isDebugEnabled()) {
+	                    log.trace("Practitioner role: "+ToStringBuilder.reflectionToString(pRole)+"\n");
+	                    log.trace("***** Practitioner Role Practitioner: "+ToStringBuilder.reflectionToString(pRole.getPractitioner())+"\n");
+	                    log.trace("##### Practitioner Role Organization: "+ToStringBuilder.reflectionToString(pRole.getOrganization())+"\n");
+	                    log.debug("$$$$$ Organization name: "+pRole.getOrganization().getDisplay()+" Identifier: "+
+	                    		pRole.getOrganization().getIdentifier().getValue()+"\n");
+	                    log.debug("***** Practitioner name: "+pRole.getPractitioner().getDisplay()+" Identifier: "+
+	                    		pRole.getPractitioner().getIdentifier().getValue()+"\n");
+                    }
             		PlanningPractitionerRole role = fhirMapper.fromFhirPractitionerRoleToPlanningPractitionerRole(pRole);
-            		//log.info("&&&&& Planning Practitioner Role: "+ToStringBuilder.reflectionToString(role));
                     pRoleList.add(role);
 
                 }
@@ -188,8 +195,8 @@ public class VaccineSchedulingService {
                 log.info("refreshVaccinationSchedule() # of Practitioners = "+becs.size());
                 for(BundleEntryComponent bec : becs) {
                 	Practitioner pr = (Practitioner)bec.getResource();
-                	//log.info("Practitioner info: named property: "+pr.getNamedProperty("AU MEDICAL CENTER").getName());
-                    log.info("Practitioner identifier: "+pr.getId()+" identifier: "+pr.getIdentifier());
+                	if(log.isDebugEnabled())
+                		log.debug("Practitioner identifier: "+pr.getIdentifier().get(0).getValue());
                 	PlanningPractitioner ppr = fhirMapper.fromFhirPractitionerToPlanningPractitioner(pr);
                 	practitionerList.add(ppr);
                 }
@@ -235,27 +242,34 @@ public class VaccineSchedulingService {
             List<PlanningInjection> injectionList = new ArrayList<PlanningInjection>();
             long injectionId = 0L;
             for (PlanningVaccinationCenter vaccinationCenter : vaccinationCenterList) {
-                for (int dayIndex = 0; dayIndex < windowDaysLength; dayIndex++) {
-                    LocalDate date = windowStartDate.plusDays(dayIndex);
-                    for (int lineIndex = 0; lineIndex < vaccinationCenter.getLineCount(); lineIndex++) {
-                        VaccineType vaccineType = pickVaccineType(random);
-                        for (int timeIndex = 0; timeIndex < injectionsPerLinePerDay; timeIndex++) {
-                            LocalTime time = dayStartTime.plusMinutes(injectionDurationInMinutes * timeIndex);
-                            for(PlanningPractitionerRole ppr : pRoleList) {
-                            	String planningId = ppr.getVaccinationCenterId();
-                            	String fhirId = vaccinationCenter.getId();
-                            	//log.info("planningId: "+planningId+" fhirId : "+fhirId);
-                            	if(StringUtils.equals(planningId, fhirId)) {
-		                            injectionList.add(new PlanningInjection(
-		                                injectionId++, vaccinationCenter, lineIndex,
-		                                LocalDateTime.of(date, time), vaccineType));
-                            	}
-                            }
-                        }
+                for(PlanningPractitionerRole ppr : pRoleList) {
+                	PlanningInjection pi = null;
+                	String planningId = ppr.getVaccinationCenterId();
+                	String fhirId = vaccinationCenter.getId();
+                	// Check whether practitioner is associated with the vaccination center
+                	if(StringUtils.equals(planningId, fhirId)) {
+                    	log.info("Generating time slots for Vaccination Center: "+ppr.getVaccinationCenterName()+
+                    			" and Practitioner: "+ppr.getPractitionerName()+" planning or Id: "+planningId+" equals fhir Id : "+fhirId);
+			            for (int dayIndex = 0; dayIndex < windowDaysLength; dayIndex++) {
+			                LocalDate date = windowStartDate.plusDays(dayIndex);
+			                for (int lineIndex = 0; lineIndex < vaccinationCenter.getLineCount(); lineIndex++) {
+			                    VaccineType vaccineType = pickVaccineType(random);
+			                    for (int timeIndex = 0; timeIndex < injectionsPerLinePerDay; timeIndex++) {
+			                        LocalTime time = dayStartTime.plusMinutes(injectionDurationInMinutes * timeIndex);
+				                            pi = new PlanningInjection(
+				                                injectionId++, vaccinationCenter, ppr, lineIndex,
+				                                LocalDateTime.of(date, time), vaccineType);
+				                            if(log.isDebugEnabled())
+				                            	log.debug("^^^^^ Planning Injection: "+ReflectionToStringBuilder.toString(pi));
+				                            injectionList.add(pi);
+	                        	}
+	                        }
+	                    }
                         
                     }
                 }
             }
+            log.info("Planning injections created: "+injectionList.size());
             vSchedule = new VaccinationSchedule(vaccineTypeList, vaccinationCenterList, timeslotDateTimeList, personList, injectionList);
             return vSchedule;
         }

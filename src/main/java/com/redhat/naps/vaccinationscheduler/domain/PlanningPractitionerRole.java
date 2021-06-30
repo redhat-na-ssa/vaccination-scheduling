@@ -7,6 +7,22 @@ public class PlanningPractitionerRole {
 	private String vaccinationCenterId;
 	private String vaccinationCenterName;
 	
+	public PlanningPractitionerRole() {
+		super();
+		this.practitionerId = null;
+		this.practitionerName = null;
+		this.vaccinationCenterId = null;
+		this.vaccinationCenterName = null;		
+	}
+	
+	public PlanningPractitionerRole(String practitionerId, String practitionerName, String vaccinationCenterId,
+			String vaccinationCenterName) {
+		super();
+		this.practitionerId = practitionerId;
+		this.practitionerName = practitionerName;
+		this.vaccinationCenterId = vaccinationCenterId;
+		this.vaccinationCenterName = vaccinationCenterName;
+	}
 	public String getPractitionerId() {
 		return practitionerId;
 	}
@@ -30,6 +46,13 @@ public class PlanningPractitionerRole {
 	}
 	public void setVaccinationCenterName(String vaccinationCenterName) {
 		this.vaccinationCenterName = vaccinationCenterName;
+	}
+
+	@Override
+	public String toString() {
+		return "PlanningPractitionerRole [practitionerId=" + practitionerId + ", practitionerName=" + practitionerName
+				+ ", vaccinationCenterId=" + vaccinationCenterId + ", vaccinationCenterName=" + vaccinationCenterName
+				+ "]";
 	}
 
 }

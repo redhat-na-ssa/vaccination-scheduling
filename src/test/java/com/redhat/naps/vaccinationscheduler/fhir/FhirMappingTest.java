@@ -33,6 +33,7 @@ import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 
 import com.redhat.naps.vaccinationscheduler.domain.PlanningPerson;
+import com.redhat.naps.vaccinationscheduler.domain.PlanningPractitionerRole;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningVaccinationCenter;
 import com.redhat.naps.vaccinationscheduler.FhirServerAdminService;
 import com.redhat.naps.vaccinationscheduler.domain.PlanningAppointment;
@@ -194,7 +195,8 @@ public class FhirMappingTest {
 
         PlanningPerson person = new PlanningPerson(patientId, patientName, null, LocalDate.now(), 77, false, VaccineType.MODERNA, LocalDate.now());
         PlanningVaccinationCenter pvc = new PlanningVaccinationCenter("1","CHANGEME", new PlanningLocation(90.00, 135.00), 1);
-        PlanningInjection pInjection = new PlanningInjection(1001L, pvc, 1, LocalDateTime.now(), VaccineType.MODERNA, person);
+        PlanningPractitionerRole ppr = new PlanningPractitionerRole("1", "John Doe", "1", "CHANGEME");
+        PlanningInjection pInjection = new PlanningInjection(1001L, pvc, ppr, 1, LocalDateTime.now(), VaccineType.MODERNA, person);
         return pInjection;
     }
 

@@ -30,6 +30,7 @@ public class PlanningInjection {
     private Long id;
 
     private PlanningVaccinationCenter vaccinationCenter;
+    private PlanningPractitionerRole practitionerRole;
     private int lineIndex;
     private LocalDateTime dateTime;
     private VaccineType vaccineType;
@@ -44,18 +45,20 @@ public class PlanningInjection {
     public PlanningInjection() {
     }
 
-    public PlanningInjection(Long id, PlanningVaccinationCenter vaccinationCenter, int lineIndex,
+    public PlanningInjection(Long id, PlanningVaccinationCenter vaccinationCenter, PlanningPractitionerRole practitionerRole, int lineIndex,
             LocalDateTime dateTime, VaccineType vaccineType) {
         this.id = id;
         this.vaccinationCenter = vaccinationCenter;
+        this.practitionerRole = practitionerRole;
         this.lineIndex = lineIndex;
         this.dateTime = dateTime;
         this.vaccineType = vaccineType;
     }
 
-    public PlanningInjection(long id, PlanningVaccinationCenter vaccinationCenter, int lineIndex, LocalDateTime dateTime, VaccineType vaccineType, PlanningPerson person) {
+    public PlanningInjection(long id, PlanningVaccinationCenter vaccinationCenter, PlanningPractitionerRole practitionerRole, int lineIndex, LocalDateTime dateTime, VaccineType vaccineType, PlanningPerson person) {
         this.id = id;
         this.vaccinationCenter = vaccinationCenter;
+        this.practitionerRole = practitionerRole;
         this.lineIndex = lineIndex;
         this.dateTime = dateTime;
         this.vaccineType = vaccineType;
@@ -98,5 +101,13 @@ public class PlanningInjection {
     public void setPerson(PlanningPerson person) {
         this.person = person;
     }
+
+	public PlanningPractitionerRole getPractitionerRole() {
+		return practitionerRole;
+	}
+
+	public void setPractitionerRole(PlanningPractitionerRole practitionerRole) {
+		this.practitionerRole = practitionerRole;
+	}
 
 }
