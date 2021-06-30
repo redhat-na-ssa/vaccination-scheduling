@@ -78,24 +78,24 @@ public class FhirMapper {
     }
 
     public PlanningPractitioner fromFhirPractitionerToPlanningPractitioner(Practitioner pObj) {
-    	String name = (pObj.getName()==null || pObj.getName().isEmpty())?"":pObj.getName().get(0).getFamily();
-    	PlanningPractitioner pPrac = new PlanningPractitioner(name);
-    	
-    	return pPrac;
+        String name = (pObj.getName()==null || pObj.getName().isEmpty())?"":pObj.getName().get(0).getFamily();
+        PlanningPractitioner pPrac = new PlanningPractitioner(name);
+        
+        return pPrac;
     }
 
-	public PlanningPractitionerRole fromFhirPractitionerRoleToPlanningPractitionerRole(PractitionerRole pr) {
-		PlanningPractitionerRole pRole = new PlanningPractitionerRole();
+    public PlanningPractitionerRole fromFhirPractitionerRoleToPlanningPractitionerRole(PractitionerRole pr) {
+        PlanningPractitionerRole pRole = new PlanningPractitionerRole();
 
-		pRole.setPractitionerId(pr.getPractitioner().getIdentifier().getValue());
-		pRole.setPractitionerName(pr.getPractitioner().getDisplay());
-		pRole.setVaccinationCenterId(pr.getOrganization().getIdentifier().getValue());
-		pRole.setVaccinationCenterName(pr.getOrganization().getDisplay());
-		return pRole;
-	}
+        pRole.setPractitionerId(pr.getPractitioner().getIdentifier().getValue());
+        pRole.setPractitionerName(pr.getPractitioner().getDisplay());
+        pRole.setVaccinationCenterId(pr.getOrganization().getIdentifier().getValue());
+        pRole.setVaccinationCenterName(pr.getOrganization().getDisplay());
+        return pRole;
+    }
 
     public PlanningVaccinationCenter fromFhirOrganizationToPlanningVaccinationCenter(Organization pObj, Location lObj) {
-    	String id = pObj.getIdentifier().get(0).getValue();
+        String id = pObj.getIdentifier().get(0).getValue();
         String name = pObj.getName();
         LocationPositionComponent lpObj = lObj.getPosition();
         PlanningLocation pLocation = new PlanningLocation(lpObj.getLatitude().doubleValue(), lpObj.getLongitude().doubleValue());

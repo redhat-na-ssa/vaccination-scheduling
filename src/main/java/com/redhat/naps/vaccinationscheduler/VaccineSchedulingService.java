@@ -98,7 +98,7 @@ public class VaccineSchedulingService {
                     Organization org = (Organization)bec.getResource();
                     
                     if(log.isDebugEnabled())
-                    	log.debug("!!!!! Organization name: "+org.getName()+" identifier: "+org.getIdentifier().get(0).getValue());
+                        log.debug("!!!!! Organization name: "+org.getName()+" identifier: "+org.getIdentifier().get(0).getValue());
                     
                     // 2)  For each Organization, grab corresponding Location
                     Location lObj = fhirServerService.getLocationFromOrganization(org);
@@ -107,7 +107,7 @@ public class VaccineSchedulingService {
                         vaccinationCenterList.add(pvc);
                     }else {
                         log.warn("refreshVaccinationSchedule() will not consider the following hospital since it does not include a Location : "
-                        		+org.getName());
+                                +org.getName());
                     }
                 }
     
@@ -134,12 +134,12 @@ public class VaccineSchedulingService {
                 for(BundleEntryComponent bec : becs) {
                     PractitionerRole pRole = (PractitionerRole)bec.getResource();
                     if(log.isDebugEnabled()) {
-	                    log.debug("$$$$$ Organization name: "+pRole.getOrganization().getDisplay()+" Identifier: "+
-	                    		pRole.getOrganization().getIdentifier().getValue()+"\n");
-	                    log.debug("***** Practitioner name: "+pRole.getPractitioner().getDisplay()+" Identifier: "+
-	                    		pRole.getPractitioner().getIdentifier().getValue()+"\n");
+                        log.debug("$$$$$ Organization name: "+pRole.getOrganization().getDisplay()+" Identifier: "+
+                                pRole.getOrganization().getIdentifier().getValue()+"\n");
+                        log.debug("***** Practitioner name: "+pRole.getPractitioner().getDisplay()+" Identifier: "+
+                                pRole.getPractitioner().getIdentifier().getValue()+"\n");
                     }
-            		PlanningPractitionerRole role = fhirMapper.fromFhirPractitionerRoleToPlanningPractitionerRole(pRole);
+                    PlanningPractitionerRole role = fhirMapper.fromFhirPractitionerRoleToPlanningPractitionerRole(pRole);
                     pRoleList.add(role);
 
                 }
@@ -189,11 +189,11 @@ public class VaccineSchedulingService {
                 List<BundleEntryComponent> becs = bObj.getEntry();
                 log.info("refreshVaccinationSchedule() # of Practitioners = "+becs.size());
                 for(BundleEntryComponent bec : becs) {
-                	Practitioner pr = (Practitioner)bec.getResource();
-                	if(log.isDebugEnabled())
-                		log.debug("Practitioner identifier: "+pr.getIdentifier().get(0).getValue());
-                	PlanningPractitioner ppr = fhirMapper.fromFhirPractitionerToPlanningPractitioner(pr);
-                	practitionerList.add(ppr);
+                    Practitioner pr = (Practitioner)bec.getResource();
+                    if(log.isDebugEnabled())
+                        log.debug("Practitioner identifier: "+pr.getIdentifier().get(0).getValue());
+                    PlanningPractitioner ppr = fhirMapper.fromFhirPractitionerToPlanningPractitioner(pr);
+                    practitionerList.add(ppr);
                 }
 
             }catch(WebApplicationException x) {
@@ -238,26 +238,26 @@ public class VaccineSchedulingService {
             long injectionId = 0L;
             for (PlanningVaccinationCenter vaccinationCenter : vaccinationCenterList) {
                 for(PlanningPractitionerRole ppr : pRoleList) {
-                	PlanningInjection pi = null;
-                	String planningId = ppr.getVaccinationCenterId();
-                	String fhirId = vaccinationCenter.getId();
-                	// Check whether practitioner is associated with the vaccination center
-                	if(StringUtils.equals(planningId, fhirId)) {
-                    	log.info("Generating time slots for Vaccination Center: "+ppr.getVaccinationCenterName()+
-                    			" and Practitioner: "+ppr.getPractitionerName()+" planning or Id: "+planningId+" equals fhir Id : "+fhirId);
-			            for (int dayIndex = 0; dayIndex < windowDaysLength; dayIndex++) {
-			                LocalDate date = windowStartDate.plusDays(dayIndex);
-			                for (int lineIndex = 0; lineIndex < vaccinationCenter.getLineCount(); lineIndex++) {
-			                    VaccineType vaccineType = pickVaccineType(random);
-			                    for (int timeIndex = 0; timeIndex < injectionsPerLinePerDay; timeIndex++) {
-			                        LocalTime time = dayStartTime.plusMinutes(injectionDurationInMinutes * timeIndex);
-				                            pi = new PlanningInjection(
-				                                injectionId++, vaccinationCenter, ppr, lineIndex,
-				                                LocalDateTime.of(date, time), vaccineType);
-				                            injectionList.add(pi);
-	                        	}
-	                        }
-	                    }
+                    PlanningInjection pi = null;
+                    String planningId = ppr.getVaccinationCenterId();
+                    String fhirId = vaccinationCenter.getId();
+                    // Check whether practitioner is associated with the vaccination center
+                    if(StringUtils.equals(planningId, fhirId)) {
+                        log.info("Generating time slots for Vaccination Center: "+ppr.getVaccinationCenterName()+
+                                " and Practitioner: "+ppr.getPractitionerName()+" planning or Id: "+planningId+" equals fhir Id : "+fhirId);
+                        for (int dayIndex = 0; dayIndex < windowDaysLength; dayIndex++) {
+                            LocalDate date = windowStartDate.plusDays(dayIndex);
+                            for (int lineIndex = 0; lineIndex < vaccinationCenter.getLineCount(); lineIndex++) {
+                                VaccineType vaccineType = pickVaccineType(random);
+                                for (int timeIndex = 0; timeIndex < injectionsPerLinePerDay; timeIndex++) {
+                                    LocalTime time = dayStartTime.plusMinutes(injectionDurationInMinutes * timeIndex);
+                                            pi = new PlanningInjection(
+                                                injectionId++, vaccinationCenter, ppr, lineIndex,
+                                                LocalDateTime.of(date, time), vaccineType);
+                                            injectionList.add(pi);
+                                }
+                            }
+                        }
                         
                     }
                 }

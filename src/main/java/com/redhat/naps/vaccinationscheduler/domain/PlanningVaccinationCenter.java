@@ -18,7 +18,7 @@ package com.redhat.naps.vaccinationscheduler.domain;
 
 public class PlanningVaccinationCenter {
 
-	private String id;
+    private String id;
     private String name;
     private PlanningLocation location;
     private int lineCount;
@@ -26,7 +26,7 @@ public class PlanningVaccinationCenter {
     public PlanningVaccinationCenter() {}
 
     public PlanningVaccinationCenter(String id, String name, PlanningLocation location, int lineCount) {
-    	this.id = id;
+        this.id = id;
         this.name = name;
         this.location = location;
         this.lineCount = lineCount;
@@ -41,36 +41,36 @@ public class PlanningVaccinationCenter {
     // Getters and setters
     // ************************************************************************
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public PlanningLocation getLocation() {
-		return location;
-	}
+    public PlanningLocation getLocation() {
+        return location;
+    }
 
-	public void setLocation(PlanningLocation location) {
-		this.location = location;
-	}
+    public void setLocation(PlanningLocation location) {
+        this.location = location;
+    }
 
-	public int getLineCount() {
-		return lineCount;
-	}
+    public int getLineCount() {
+        return lineCount;
+    }
 
-	public void setLineCount(int lineCount) {
-		this.lineCount = lineCount;
-	}
+    public void setLineCount(int lineCount) {
+        this.lineCount = lineCount;
+    }
 
 }

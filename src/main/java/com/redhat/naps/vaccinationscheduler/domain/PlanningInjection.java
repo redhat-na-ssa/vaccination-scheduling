@@ -102,12 +102,12 @@ public class PlanningInjection {
         this.person = person;
     }
 
-	public PlanningPractitionerRole getPractitionerRole() {
-		return practitionerRole;
-	}
+    public PlanningPractitionerRole getPractitionerRole() {
+        return practitionerRole;
+    }
 
-	public void setPractitionerRole(PlanningPractitionerRole practitionerRole) {
-		this.practitionerRole = practitionerRole;
-	}
+    public void setPractitionerRole(PlanningPractitionerRole practitionerRole) {
+        this.practitionerRole = practitionerRole;
+    }
 
 }

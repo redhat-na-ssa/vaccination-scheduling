@@ -183,7 +183,6 @@ public class FhirServerAdminService {
                 String notUsed = ero.getNextRecord();
                 fhirRecordCount++;
             }
-            log.info("seedFhirServer() generated the following # of patients: "+patientGeneratorCount+" to output dir = "+outputDir+" at the following location: "+options.city+" "+patientGeneratorState+" .  Will sleep for the following millis: "+sleepMillisAfterFhirGeneration);
 
             // 6) Sleep for 5 seconds otherwise all files are not actually written to disk
             generatorService.shutdownNow();
@@ -192,6 +191,8 @@ public class FhirServerAdminService {
             // 7) Determine whether this hospital already exists in the FHIR server
             boolean hospitalAlreadyExistsInFhriServer = determineHospitalExistenceInFhirServer(outputDir);
             if(!hospitalAlreadyExistsInFhriServer) {
+
+                log.info("seedFhirServer() generated the following # of patients: "+patientGeneratorCount+" to output dir = "+outputDir+" at the following location: "+options.city+" "+patientGeneratorState+" .  Will sleep for the following millis: "+sleepMillisAfterFhirGeneration);
 
                 // 8) Seed FHIR Server with Hospital and Practitioner resources
                 seedGeneratedResourcesToFhirServer(outputDir);
@@ -333,8 +334,8 @@ public class FhirServerAdminService {
         List<BundleEntryComponent> becs = bObj.getEntry();
         int counter = 2;
         for(BundleEntryComponent bec : becs){
-        	Practitioner pObj = null;
-        	PractitionerRole prObj = null;
+            Practitioner pObj = null;
+            PractitionerRole prObj = null;
             if(counter % 2 == 0) {
                 pObj = (Practitioner)bec.getResource();
                 String pJson = fhirCtx.newJsonParser().encodeResourceToString(pObj);
