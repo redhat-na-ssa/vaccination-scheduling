@@ -37,8 +37,6 @@ import javax.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.github.javaparser.utils.Log;
@@ -136,9 +134,6 @@ public class VaccineSchedulingService {
                 for(BundleEntryComponent bec : becs) {
                     PractitionerRole pRole = (PractitionerRole)bec.getResource();
                     if(log.isDebugEnabled()) {
-	                    log.trace("Practitioner role: "+ToStringBuilder.reflectionToString(pRole)+"\n");
-	                    log.trace("***** Practitioner Role Practitioner: "+ToStringBuilder.reflectionToString(pRole.getPractitioner())+"\n");
-	                    log.trace("##### Practitioner Role Organization: "+ToStringBuilder.reflectionToString(pRole.getOrganization())+"\n");
 	                    log.debug("$$$$$ Organization name: "+pRole.getOrganization().getDisplay()+" Identifier: "+
 	                    		pRole.getOrganization().getIdentifier().getValue()+"\n");
 	                    log.debug("***** Practitioner name: "+pRole.getPractitioner().getDisplay()+" Identifier: "+
@@ -259,8 +254,6 @@ public class VaccineSchedulingService {
 				                            pi = new PlanningInjection(
 				                                injectionId++, vaccinationCenter, ppr, lineIndex,
 				                                LocalDateTime.of(date, time), vaccineType);
-				                            if(log.isDebugEnabled())
-				                            	log.debug("^^^^^ Planning Injection: "+ReflectionToStringBuilder.toString(pi));
 				                            injectionList.add(pi);
 	                        	}
 	                        }
