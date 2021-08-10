@@ -139,7 +139,7 @@ $ podman run -d \
 . This database can be cleared if needed by executing the following (using the psql utility at the command line):
 +
 -----
-$    psql -h localhost -U admin r4 -c 'drop owned by admin'
+$    psql -h localhost -U fhir fhir -c 'drop owned by admin'
 -----
 +
 NOTE:  Be sure to stop the FHIR server (describe in the next section) before dropping the database tables
@@ -152,7 +152,7 @@ $ git clone https://github.com/hapifhir/hapi-fhir-jpaserver-starter
 
 $ cd hapi-fhir-jpaserver-starter
 
-$ git checkout v5.3.0
+$ git checkout v5.4.1
 -----
 
 . Edit src/main/resources/application.yaml as per the following:
@@ -172,6 +172,9 @@ $ git checkout v5.3.0
 
 -#    reuse_cached_search_results_millis: 60000
 +    reuse_cached_search_results_millis: 5000
+
+-#    default_page_size: 20
++    default_page_size: 100
 -----
 
 . Start HAPI FHIR server

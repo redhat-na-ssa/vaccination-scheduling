@@ -62,10 +62,6 @@ public class FhirServerAdminService {
     int sleepMillisAfterHospitalPost;
 
     @Inject
-    @ConfigProperty(name = FhirUtil.HOSPITAL_GENERATOR_COUNT, defaultValue = "1")
-    int hospitalGeneratorCount;
-
-    @Inject
     @ConfigProperty(name = FhirUtil.PATIENT_GENERATOR_COUNT, defaultValue = "1")
     int patientGeneratorCount;
 
@@ -130,7 +126,6 @@ public class FhirServerAdminService {
     public int seedFhirServer(final FhirServerAdminConfig adminConfig) throws InterruptedException, IOException {
 
         if(adminConfig != null){
-            this.hospitalGeneratorCount = adminConfig.getHospitalGeneratorCount();
             this.patientGeneratorCount = adminConfig.getPatientGeneratorCount();
             if(StringUtils.isNotEmpty(adminConfig.getPatientGeneratorCity()))
                 this.patientGeneratorCity = adminConfig.getPatientGeneratorCity();
@@ -155,9 +150,7 @@ public class FhirServerAdminService {
         Config.set("exporter.practitioner.fhir.export", "true");
         Config.set("generate.only_alive_patients", "true");
         
-        // 3)  Loop by # of hospitals to generate
         int totalPatientCount=0;
-        for(int c=0; c < hospitalGeneratorCount; c++) {
 
             // 4)  Define a unique directory on the filesystem where output files will be written to
             long randomSeed = ThreadLocalRandom.current().nextLong(100, 100000);
@@ -188,54 +181,15 @@ public class FhirServerAdminService {
             generatorService.shutdownNow();
             Thread.sleep(sleepMillisAfterFhirGeneration);
 
-            // 7) Determine whether this hospital already exists in the FHIR server
-            boolean hospitalAlreadyExistsInFhriServer = determineHospitalExistenceInFhirServer(outputDir);
-            if(!hospitalAlreadyExistsInFhriServer) {
+            log.info("seedFhirServer() generated the following # of patients: "+patientGeneratorCount+" to output dir = "+outputDir+" at the following location: "+options.city+" "+patientGeneratorState+" .  Will sleep for the following millis: "+sleepMillisAfterFhirGeneration);
 
-                log.info("seedFhirServer() generated the following # of patients: "+patientGeneratorCount+" to output dir = "+outputDir+" at the following location: "+options.city+" "+patientGeneratorState+" .  Will sleep for the following millis: "+sleepMillisAfterFhirGeneration);
-
-                // 8) Seed FHIR Server with Hospital and Practitioner resources
-                seedGeneratedResourcesToFhirServer(outputDir);
+            // 8) Seed FHIR Server with Hospital and Practitioner resources
+            seedGeneratedResourcesToFhirServer(outputDir);
     
-                totalPatientCount = totalPatientCount+patientGeneratorCount;
-            }
+            totalPatientCount = totalPatientCount+patientGeneratorCount;
             
-        }
         log.info("seedFhirServer() Total # of patients pushed to fhir server = "+totalPatientCount);
         return totalPatientCount;
-
-    }
-
-    private boolean determineHospitalExistenceInFhirServer(String outputDir) throws IOException {
-
-        FilenameFilter filter = (dir, name) -> name.startsWith(FhirUtil.HOSPITAL_INFORMATION);
-        File outputDirFile = new File(outputDir+"fhir");
-        File[] hospitalFiles = outputDirFile.listFiles(filter);
-        if(hospitalFiles == null || hospitalFiles.length == 0)
-            throw new RuntimeException("determineHospitalExistenceInFhirServer() No hospital files at the following directory: "+outputDir);
-
-        File hospitalFile = hospitalFiles[0];
-        
-        InputStream fStream = null;
-        String bundleString = null;
-        try {
-            fStream = new FileInputStream(hospitalFile);
-            bundleString = IOUtils.toString(fStream, "UTF-8");
-        }finally {
-            if(fStream != null)
-            fStream.close();
-        }
-        
-        Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, bundleString);
-        Organization hObj = (Organization)bObj.getEntryFirstRep().getResource();
-        Location hospital = this.getLocationFromOrganization(hObj);
-        if(hospital != null) {
-            log.warn(hObj.getName()+" :  This hospital already exists in fhir server. Will not push a duplicate");
-            return true;
-        } else {
-            log.info(hObj.getName()+" :  This hospital does NOT already exists in fhir server. Will seed fhir server");
-            return false;
-        }
 
     }
    
@@ -284,40 +238,61 @@ public class FhirServerAdminService {
               fStream.close();
         }
 
-        // 2) POST Organization
         Bundle bObj = fhirCtx.newJsonParser().parseResource(Bundle.class, bundleString);
-        Organization pObj = (Organization)bObj.getEntryFirstRep().getResource();
-        String pJson = fhirCtx.newJsonParser().encodeResourceToString(pObj);
-        Response response = null;
-        try {
-            response = fhirClient.postOrganization(pJson);
-            log.tracev("{0}    seedHospital() fhir server status code: {1}", pObj.getName(), response.getStatus());
-        }catch(WebApplicationException x){
-            response = x.getResponse();
-            log.error("seedHospital() error status = "+response.getStatus()+"  when posting the following Organization to the FhirServer: "+pObj.getId());
-            log.error("seedHospital() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
-        }finally {
-            if(response != null)
-                response.close();
-        }
-
-        // 3) POST corresponding Location
         List<BundleEntryComponent> becs = bObj.getEntry();
-        Location lObj = (Location) becs.get(1).getResource();
-        String lJson = fhirCtx.newJsonParser().encodeResourceToString(lObj);
-        response = null;
-        try {
-            response = fhirClient.postLocation(lJson);
-            log.tracev("{0}    seedHospital() fhir server status code when posting location: {1}", lObj.getName(), response.getStatus());
-        }catch(WebApplicationException x){
-            response = x.getResponse();
-            log.error("seedHospital() error status = "+response.getStatus()+"  when posting the following Location to the FhirServer: "+lObj.getId());
-            log.error("seedHospital() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
-        }finally {
-            if(response != null)
-                response.close();
-        }
+        int counter = 2;
+        Location lObj = null;
+        Organization oObj = null;
+        for(BundleEntryComponent bec : becs){
+            if(counter % 2 == 0) {
 
+                // 2) POST Organization
+                
+                oObj = (Organization)bec.getResource();
+
+                // 2.1) Determine if Hospital already exists in FHIR server
+                lObj = getLocationFromOrganization(oObj);
+                if(lObj == null) {
+
+                    String pJson = fhirCtx.newJsonParser().encodeResourceToString(oObj);
+                    Response response = null;
+                    try {
+                        response = fhirClient.postOrganization(pJson);
+                        log.debugv("{0}    seedHospital() fhir server status code: {1}", oObj.getName(), response.getStatus());
+                    }catch(WebApplicationException x){
+                        response = x.getResponse();
+                        log.error("seedHospital() error status = "+response.getStatus()+"  when posting the following Organization to the FhirServer: "+oObj.getId());
+                        log.error("seedHospital() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
+                    }finally {
+                        if(response != null)
+                            response.close();
+                    }
+                } else {
+                    log.warn("The following hospital already exists in FHIR server so will not re-post: "+ oObj.getName());
+                }
+            } else {
+                if(lObj == null) {
+                    // 3) POST corresponding Location
+                    lObj = (Location) bec.getResource();
+                    String lJson = fhirCtx.newJsonParser().encodeResourceToString(lObj);
+                    Response response = null;
+                    try {
+                        response = fhirClient.postLocation(lJson);
+                        log.infov("{0}    seedHospital() fhir server status code when posting location: {1}", lObj.getName(), response.getStatus());
+                    }catch(WebApplicationException x){
+                        response = x.getResponse();
+                        log.error("seedHospital() error status = "+response.getStatus()+"  when posting the following Location to the FhirServer: "+lObj.getId());
+                        log.error("seedHospital() error message = "+IOUtils.toString((InputStream)response.getEntity(), "UTF-8"));
+                    }finally {
+                        if(response != null)
+                            response.close();
+                    }
+                } else {
+                    log.warn("The following hospital already exists in FHIR server so will not re-post corresponding location: "+ oObj.getName());
+                }
+            }
+            counter++;
+        }
     }
 
     private void seedPractitioner(File practitionerFile) throws IOException {

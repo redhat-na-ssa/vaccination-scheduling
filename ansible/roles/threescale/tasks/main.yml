@@ -41,6 +41,7 @@
     kind: route
     files:
       - "{{ work_dir }}/route.yml"
+  ignore_errors: true
 
 - name: "Create {{ prod_apicast_name }}; {{ threescale_portal_endpoint }}"
   shell: |
@@ -52,6 +53,7 @@
            -n {{ namespace }}
   register: create_prod_gw
   failed_when: create_prod_gw.stderr != ""  and 'already exists' not in create_prod_gw.stderr
+  ignore_errors: true
 
 # Creating apicast route; ensure that 3scale product is set to: APIcast self-managed
 #   ie:  Product -> Integration -> Settings -> Deployment -> APIcast self-managed
