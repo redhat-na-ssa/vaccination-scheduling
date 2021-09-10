@@ -8,9 +8,9 @@
     name: "{{ apicast_secret }}"
     type: generic
     from_literal:
-      password: "{{ threescale_portal_endpoint }}"
+      password: "{{ threescale_tenant_admin_endpoint }}"
 
-- name: "Create {{ stage_apicast_name }}; {{ threescale_portal_endpoint }}"
+- name: "Create {{ stage_apicast_name }}; {{ threescale_tenant_admin_endpoint }}"
   shell: |
     oc new-app \
            -f {{ tenant_api_gw_template_url }} \
@@ -43,7 +43,7 @@
       - "{{ work_dir }}/route.yml"
   ignore_errors: true
 
-- name: "Create {{ prod_apicast_name }}; {{ threescale_portal_endpoint }}"
+- name: "Create {{ prod_apicast_name }}; {{ threescale_tenant_admin_endpoint }}"
   shell: |
     oc new-app \
            -f {{ tenant_api_gw_template_url }} \
